@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/opt/homebrew/Cellar/php@8.3/8.3.24/bin/php",
+            "args": [
+                "/Users/ihorshtohryn/Documents/web2025/projects/daynotes/daynotes.api/laravel/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
