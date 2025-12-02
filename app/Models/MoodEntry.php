@@ -17,6 +17,8 @@ class MoodEntry extends Model
 
     protected $casts = [
         'mood_score' => MoodScore::class,
+        'user_id' => 'integer',
+        'note' => 'string',
     ];
 
     public function user()
