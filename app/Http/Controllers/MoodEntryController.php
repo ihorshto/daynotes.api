@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Actions\MoodEntry\CreateMoodEntryAction;
 use App\Actions\MoodEntry\DeleteMoodEntryAction;
+use App\Actions\MoodEntry\FilterMoodEntriesAction;
 use App\Actions\MoodEntry\UpdateMoodEntryAction;
 use App\Http\Requests\CreateMoodEntryRequest;
 use App\Http\Resources\MoodEntryResource;
 use App\Models\MoodEntry;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 class MoodEntryController extends Controller
@@ -16,14 +18,15 @@ class MoodEntryController extends Controller
     public function __construct(
         private readonly CreateMoodEntryAction $createMoodEntryAction,
         private readonly UpdateMoodEntryAction $updateMoodEntryAction,
-        private readonly DeleteMoodEntryAction $deleteMoodEntryAction
+        private readonly DeleteMoodEntryAction $deleteMoodEntryAction,
+        private readonly FilterMoodEntriesAction $filterMoodEntriesAction,
     ) {}
 
-    public function index(Request $request): MoodEntryResource
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return $request->user()->moodEntries()->get()->map(function (MoodEntry $moodEntry) {
-            return MoodEntryResource::make($moodEntry);
-        });
+        $filteredMoodEntries = $this->filterMoodEntriesAction->execute($request);
+
+        return MoodEntryResource::collection($filteredMoodEntries);
     }
 
     public function show(MoodEntry $moodEntry): MoodEntryResource
