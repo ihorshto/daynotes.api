@@ -13,9 +13,11 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    Route::get('/mood-entries', [MoodEntryController::class, 'index']);
+    Route::get('/mood-entries/{moodEntry}', [MoodEntryController::class, 'show']);
     Route::post('/mood-entries/create', [MoodEntryController::class, 'create']);
     Route::post('/mood-entries/{moodEntry}/update', [MoodEntryController::class, 'update']);
-    Route::delete('/mood-entries/{moodEntry}/delete', [MoodEntryController::class, 'delete']);
+    Route::delete('/mood-entries/{moodEntry}/destroy', [MoodEntryController::class, 'destroy']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
