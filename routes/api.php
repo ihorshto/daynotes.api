@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MoodEntryController;
+use App\Http\Controllers\NotificationSettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/mood-entries/create', [MoodEntryController::class, 'create']);
     Route::post('/mood-entries/{moodEntry}/update', [MoodEntryController::class, 'update']);
     Route::delete('/mood-entries/{moodEntry}/destroy', [MoodEntryController::class, 'destroy']);
+
+    // Notification Settings
+    Route::post('/notification-settings/update', [NotificationSettingController::class, 'update'])->name('notification-settings.update');
 
     Route::post('/logout', [AuthController::class, 'logout']);
 });
