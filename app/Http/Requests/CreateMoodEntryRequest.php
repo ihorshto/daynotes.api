@@ -25,6 +25,7 @@ class CreateMoodEntryRequest extends FormRequest
     {
         return [
             'mood_score' => ['required', new Enum(MoodScore::class)],
+            'time_of_day' => ['required', 'in:morning,afternoon,evening'],
             'note' => ['nullable', 'string', 'max:2000'],
         ];
     }
@@ -36,6 +37,8 @@ class CreateMoodEntryRequest extends FormRequest
             'mood_score.enum' => 'The selected mood score is invalid.',
             'note.string' => 'The note must be a string.',
             'note.max' => 'The note may not be greater than 2000 characters.',
+            'time_of_day.required' => 'The time of day is required.',
+            'time_of_day.in' => 'The selected time of day is invalid. Allowed values are morning, afternoon, evening.',
         ];
     }
 }

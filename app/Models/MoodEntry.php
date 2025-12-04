@@ -12,11 +12,13 @@ class MoodEntry extends Model
     protected $fillable = [
         'user_id',
         'mood_score',
+        'time_of_day',
         'note',
     ];
 
     protected $casts = [
         'mood_score' => MoodScore::class,
+        'time_of_day' => 'string',
         'user_id' => 'integer',
         'note' => 'string',
     ];
