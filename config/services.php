@@ -35,4 +35,7 @@ return [
         ],
     ],
 
+    'telegram-bot-api' => [
+        'token' => env('FRONTEND_URL'),
+    ],
 ];
