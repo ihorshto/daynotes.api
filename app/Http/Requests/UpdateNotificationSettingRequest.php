@@ -29,6 +29,8 @@ class UpdateNotificationSettingRequest extends FormRequest
             'afternoon_enabled' => ['nullable', 'boolean'],
             'evening_enabled' => ['nullable', 'boolean'],
             'timezone' => ['nullable', 'string', 'max:255'],
+            'email_enabled' => ['nullable', 'boolean'],
+            'telegram_enabled' => ['nullable', 'boolean'],
         ];
     }
 

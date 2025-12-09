@@ -9,16 +9,20 @@ class UpdateNotificationSettingAction
 {
     public function execute(User $user, array $data): NotificationSetting
     {
+        $setting = $user->notificationSetting;
+
         return $user->notificationSetting()->updateOrCreate(
             ['user_id' => $user->id],
             [
-                'morning_time' => $data['morning_time'] ?? $user->notificationSetting->morning_time,
-                'afternoon_time' => $data['afternoon_time'] ?? $user->notificationSetting->afternoon_time,
-                'evening_time' => $data['evening_time'] ?? $user->notificationSetting->evening_time,
-                'morning_enabled' => $data['morning_enabled'] ?? $user->notificationSetting->morning_enabled,
-                'afternoon_enabled' => $data['afternoon_enabled'] ?? $user->notificationSetting->afternoon_enabled,
-                'evening_enabled' => $data['evening_enabled'] ?? $user->notificationSetting->evening_enabled,
-                'timezone' => $data['timezone'] ?? $user->notificationSetting->timezone,
+                'morning_time' => $data['morning_time'] ?? $setting?->morning_time ?? '09:00',
+                'afternoon_time' => $data['afternoon_time'] ?? $setting?->afternoon_time ?? '14:00',
+                'evening_time' => $data['evening_time'] ?? $setting?->evening_time ?? '20:00',
+                'morning_enabled' => $data['morning_enabled'] ?? $setting?->morning_enabled ?? true,
+                'afternoon_enabled' => $data['afternoon_enabled'] ?? $setting?->afternoon_enabled ?? true,
+                'evening_enabled' => $data['evening_enabled'] ?? $setting?->evening_enabled ?? true,
+                'timezone' => $data['timezone'] ?? $setting?->timezone ?? 'Europe/Kyiv',
+                'email_enabled' => $data['email_enabled'] ?? $setting?->email_enabled ?? true,
+                'telegram_enabled' => $data['telegram_enabled'] ?? $setting?->telegram_enabled ?? false,
             ]
         );
     }

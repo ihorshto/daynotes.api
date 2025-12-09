@@ -17,6 +17,9 @@ class NotificationSetting extends Model
         'afternoon_enabled',
         'evening_enabled',
         'timezone',
+        'email_enabled',
+        'telegram_enabled',
+        'telegram_chat_id',
     ];
 
     protected $casts = [
@@ -25,6 +28,9 @@ class NotificationSetting extends Model
         'afternoon_enabled' => 'boolean',
         'evening_enabled' => 'boolean',
         'timezone' => 'string',
+        'email_enabled' => 'boolean',
+        'telegram_enabled' => 'boolean',
+        'telegram_chat_id' => 'string',
     ];
 
     public function user()
