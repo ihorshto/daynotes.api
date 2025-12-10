@@ -36,11 +36,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/send-message', [TelegramController::class, 'sendTelegramMessage']);
     });
 
-    Route::get('/test-email', function () {
+    Route::get('/test-notification', function () {
         $user = User::first();
         $user->notify(new MoodReminderNotification('morning'));
 
-        return 'Email sent!';
+        return 'Notifications sent!';
     });
 });
 
