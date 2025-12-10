@@ -121,7 +121,7 @@ class TelegramController extends Controller
                 $this->sendTelegramMessage(
                     $settings->telegram_chat_id,
                     " *Telegram Notifications Disconnected*\n\n".
-                    'Your Telegram no longer will receive notifications from our app.'.
+                    "Your Telegram no longer will receive notifications from our app. \n".
                     'If this was a mistake, you can reconnect anytime from your account settings.'
                 );
             } catch (\Exception $e) {

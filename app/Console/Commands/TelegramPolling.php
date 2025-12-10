@@ -25,7 +25,7 @@ class TelegramPolling extends Command
         // Disable webhook (because polling and webhook don't work together)
         Http::post("https://api.telegram.org/bot{$token}/deleteWebhook");
 
-        $this->info('✅ Webhook disabled, polling active');
+        $this->info('Webhook disabled, polling active');
 
         while (true) {
             try {
@@ -48,7 +48,7 @@ class TelegramPolling extends Command
                 }
 
             } catch (\Exception $e) {
-                $this->error('❌ Error: '.$e->getMessage());
+                $this->error('Error: '.$e->getMessage());
                 sleep(5);
             }
         }
