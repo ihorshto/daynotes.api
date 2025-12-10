@@ -18,6 +18,7 @@ class MoodReminderNotification extends Notification
 
     public function via($notifiable): array
     {
+        $channels = [];
         $settings = $notifiable->notificationSetting;
 
         if ($settings) {
@@ -49,20 +50,25 @@ class MoodReminderNotification extends Notification
             ->subject($this->getTitle())
             ->greeting($this->getTitle())
             ->line($this->getMessage())
-            ->action('Record your mood', config('app.frontend_url', 'http://localhost:3000').'/mood/new')
+            ->action('Record your mood', config('app.frontend_url', 'http://localhost:3000'))
             ->line('Thank you for taking care of your mental health! 💚');
     }
 
     public function toTelegram($notifiable): TelegramMessage
     {
-        $url = config('app.frontend_url', 'http://localhost:3000').'/mood/new';
+        $url = config('app.frontend_url', 'http://localhost:3000');
+        $isLocalhost = str_contains($url, 'localhost') || str_contains($url, '127.0.0.1');
 
-        Log::info('$notifiable' . json_encode($notifiable));
-
-        return TelegramMessage::create()
+        $message = TelegramMessage::create()
             ->to($notifiable->notificationSetting->telegram_chat_id)
-            ->content('*'.$this->getTitle()."*\n\n".$this->getMessage())
-            ->button('Record your mood 📝', $url);
+            ->content('*'.$this->getTitle()."*\n\n".$this->getMessage());
+
+        // Only add button if URL is not localhost (Telegram rejects localhost URLs)
+        if (! $isLocalhost) {
+            $message->button('Record your mood 📝', $url);
+        }
+
+        return $message;
     }
 
     private function getTitle(): string
