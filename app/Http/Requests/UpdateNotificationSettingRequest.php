@@ -28,7 +28,6 @@ class UpdateNotificationSettingRequest extends FormRequest
             'morning_enabled' => ['nullable', 'boolean'],
             'afternoon_enabled' => ['nullable', 'boolean'],
             'evening_enabled' => ['nullable', 'boolean'],
-            'timezone' => ['nullable', 'string', 'max:255'],
             'email_enabled' => ['nullable', 'boolean'],
             'telegram_enabled' => ['nullable', 'boolean'],
         ];
@@ -43,8 +42,6 @@ class UpdateNotificationSettingRequest extends FormRequest
             'morning_enabled.boolean' => 'The morning enabled field must be true or false.',
             'afternoon_enabled.boolean' => 'The afternoon enabled field must be true or false.',
             'evening_enabled.boolean' => 'The evening enabled field must be true or false.',
-            'timezone.string' => 'The timezone must be a string.',
-            'timezone.max' => 'The timezone may not be greater than 255 characters.',
         ];
     }
 }

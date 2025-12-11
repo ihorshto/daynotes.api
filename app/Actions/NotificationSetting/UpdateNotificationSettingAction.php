@@ -20,7 +20,6 @@ class UpdateNotificationSettingAction
                 'morning_enabled' => $data['morning_enabled'] ?? $setting?->morning_enabled ?? true,
                 'afternoon_enabled' => $data['afternoon_enabled'] ?? $setting?->afternoon_enabled ?? true,
                 'evening_enabled' => $data['evening_enabled'] ?? $setting?->evening_enabled ?? true,
-                'timezone' => $data['timezone'] ?? $setting?->timezone ?? 'Europe/Kyiv',
                 'email_enabled' => $data['email_enabled'] ?? $setting?->email_enabled ?? true,
                 'telegram_enabled' => $data['telegram_enabled'] ?? $setting?->telegram_enabled ?? false,
             ]

@@ -14,12 +14,14 @@ class AuthController extends Controller
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
+            'timezone' => 'nullable|string|max:255',
         ]);
 
-        $user = User::create([
+        $user = User::query()->create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
+            'timezone' => $validatedData['timezone'] ?? 'UTC',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -37,7 +39,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::query()->where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid login credentials'], 401);
