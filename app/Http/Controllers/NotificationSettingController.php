@@ -9,9 +9,10 @@ use App\Http\Resources\NotificationEntryResource;
 class NotificationSettingController extends Controller
 {
     public function __construct(
-        private readonly UpdateNotificationSettingAction $updateNotificationSettingAction) {}
+        private readonly UpdateNotificationSettingAction $updateNotificationSettingAction
+    ) {}
 
-    public function update(UpdateNotificationSettingRequest $request)
+    public function update(UpdateNotificationSettingRequest $request): NotificationEntryResource
     {
         $validated = $request->validated();
 
