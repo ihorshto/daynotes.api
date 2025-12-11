@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('mood_entries', function (Blueprint $table) {
             $table->id();
             $table->string('user_id')->constrained()->onDelete('cascade');
-            $table->tinyInteger('mood_score'); // e.g., 1-10 scale
+            $table->tinyInteger('mood_score'); // e.g., 1-5 scale
             $table->text('note')->nullable();
             $table->timestamps();
         });
