@@ -24,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('notification_settings', function (Blueprint $table) {
-            if(! Schema::hasColumn('notification_settings', 'timezone')) {
+            if (! Schema::hasColumn('notification_settings', 'timezone')) {
                 $table->string('timezone')->default('UTC')->after('evening_enabled');
             }
         });
