@@ -6,8 +6,8 @@ use App\Models\MoodEntry;
 
 class DeleteMoodEntryAction
 {
-    public function execute(MoodEntry $moodEntry)
+    public function execute(MoodEntry $moodEntry): void
     {
-        return $moodEntry->delete();
+        $moodEntry->delete();
     }
 }
