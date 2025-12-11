@@ -7,7 +7,7 @@ use App\Models\User;
 
 class CreateMoodEntryAction
 {
-    public function execute(User $user, int $moodScore, ?string $note = null): MoodEntry
+    public function execute(User $user, int $moodScore, ?string $note): MoodEntry
     {
         return $user->moodEntries()->create([
             'mood_score' => $moodScore,
