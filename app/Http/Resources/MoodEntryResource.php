@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -15,13 +17,13 @@ class MoodEntryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->getKey(),
-            'user_id' => $this->user_id,
-            'mood_score' => $this->mood_score,
+            'id'          => $this->getKey(),
+            'user_id'     => $this->user_id,
+            'mood_score'  => $this->mood_score,
             'time_of_day' => $this->time_of_day,
-            'note' => $this->note,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'note'        => $this->note,
+            'created_at'  => $this->created_at,
+            'updated_at'  => $this->updated_at,
         ];
     }
 }

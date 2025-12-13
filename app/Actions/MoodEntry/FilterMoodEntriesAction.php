@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\MoodEntry;
 
 use App\Models\MoodEntry;
@@ -9,7 +11,7 @@ use Illuminate\Support\Collection;
 class FilterMoodEntriesAction
 {
     public function __construct(
-        private MoodEntryService $moodEntryService
+        private MoodEntryService $moodEntryService,
     ) {}
 
     public function execute($request): Collection

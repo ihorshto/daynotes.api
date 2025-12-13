@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\MoodEntry;
 
 use App\Models\MoodEntry;
@@ -9,9 +11,10 @@ class CreateMoodEntryAction
 {
     public function execute(User $user, int $moodScore, ?string $note): MoodEntry
     {
-        return $user->moodEntries()->create([
+        return MoodEntry::query()->create([
+            'user_id'    => $user->id,
             'mood_score' => $moodScore,
-            'note' => $note,
+            'note'       => $note,
         ]);
     }
 }

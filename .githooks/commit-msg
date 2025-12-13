@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Commit message hook to validate commit messages with commitlint
+# Based on the original Husky commit-msg hook
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+
+cd "$PROJECT_ROOT" && docker compose -f dev-docker-compose.yml exec -T app npx --no -- commitlint --edit "$1"

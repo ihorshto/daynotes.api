@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -20,17 +23,17 @@ class TelegramController extends Controller
 
         $linkCode = Str::random(32);
 
-        cache()->put("telegram_link:{$linkCode}", $user->id, now()->addMinutes(10));
+        cache()->put('telegram_link:'.$linkCode, $user->id, now()->addMinutes(10));
 
         $botUsername = $this->getBotUsername();
 
-        $deepLink = "https://t.me/{$botUsername}?start={$linkCode}";
+        $deepLink = sprintf('https://t.me/%s?start=%s', $botUsername, $linkCode);
 
         return response()->json([
-            'link_code' => $linkCode,
-            'deep_link' => $deepLink,
+            'link_code'    => $linkCode,
+            'deep_link'    => $deepLink,
             'bot_username' => $botUsername,
-            'expires_at' => now()->addMinutes(10)->toIso8601String(),
+            'expires_at'   => now()->addMinutes(10)->toIso8601String(),
             'instructions' => [
                 '1. Click the link or open Telegram and search for @'.$botUsername,
                 '2. Press "Start" to initiate the bot.',
@@ -51,13 +54,13 @@ class TelegramController extends Controller
             $text = $update['message']['text'];
 
             if (str_starts_with($text, '/start ')) {
-                $linkCode = substr($text, 7);
+                $linkCode = mb_substr($text, 7);
                 $chatId = $update['message']['chat']['id'];
                 $username = $update['message']['from']['username'] ?? 'User';
-                $userId = cache()->pull("telegram_link:{$linkCode}");
+                $userId = cache()->pull('telegram_link:'.$linkCode);
 
                 if ($userId) {
-                    $user = User::find($userId);
+                    $user = User::query()->find($userId);
 
                     if ($user) {
                         $user->notificationSetting()->updateOrCreate(
@@ -70,10 +73,10 @@ class TelegramController extends Controller
 
                         $this->sendTelegramMessage(
                             $chatId,
-                            "✅ *Congratulations, {$username}!*\n\n".
-                            "Telegram notifications have been successfully linked to your account Mood Tracker! \n\n".
-                            "Now you'll receive mood reminders and other notifications directly here. 😊 \n\n".
-                            'Welcome aboard! 🎉'
+                            "✅ *Congratulations, {$username}!*\n\n"
+                            ."Telegram notifications have been successfully linked to your account Mood Tracker! \n\n"
+                            ."Now you'll receive mood reminders and other notifications directly here. 😊 \n\n"
+                            .'Welcome aboard! 🎉'
                         );
 
                         return response()->json(['ok' => true, 'status' => 'linked']);
@@ -81,9 +84,9 @@ class TelegramController extends Controller
                 } else {
                     $this->sendTelegramMessage(
                         $chatId,
-                        "❌ *Code Expired or Invalid*\n\n".
-                        "The link code is valid for 10 minutes only. \n\n".
-                        'Please generate a new link code from your Mood Tracker app settings and try again.'
+                        "❌ *Code Expired or Invalid*\n\n"
+                        ."The link code is valid for 10 minutes only. \n\n"
+                        .'Please generate a new link code from your Mood Tracker app settings and try again.'
                     );
 
                     return response()->json(['ok' => true, 'status' => 'expired']);
@@ -93,13 +96,13 @@ class TelegramController extends Controller
 
                 $this->sendTelegramMessage(
                     $chatId,
-                    "👋 *Hi!*\n\n".
-                    "It's a Mood Tracker Bot.\n\n".
-                    "To link this bot to your Mood Tracker account: \n".
-                    "1. Open your Mood Tracker app. \n".
-                    "2. Go to Settings > Notifications \n".
-                    "3. Click 'Connect Telegram' \n".
-                    '4. Open the provided link'
+                    "👋 *Hi!*\n\n"
+                    ."It's a Mood Tracker Bot.\n\n"
+                    ."To link this bot to your Mood Tracker account: \n"
+                    ."1. Open your Mood Tracker app. \n"
+                    ."2. Go to Settings > Notifications \n"
+                    ."3. Click 'Connect Telegram' \n"
+                    .'4. Open the provided link'
                 );
             }
         }
@@ -120,11 +123,11 @@ class TelegramController extends Controller
             try {
                 $this->sendTelegramMessage(
                     $settings->telegram_chat_id,
-                    " *Telegram Notifications Disconnected*\n\n".
-                    "Your Telegram no longer will receive notifications from our app. \n".
-                    'If this was a mistake, you can reconnect anytime from your account settings.'
+                    " *Telegram Notifications Disconnected*\n\n"
+                    ."Your Telegram no longer will receive notifications from our app. \n"
+                    .'If this was a mistake, you can reconnect anytime from your account settings.'
                 );
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 Log::error('Failed to send Telegram disconnection message: '.$e->getMessage());
             }
         }
@@ -147,20 +150,20 @@ class TelegramController extends Controller
 
         return response()->json([
             'connected' => $settings && $settings->telegram_enabled && $settings->telegram_chat_id,
-            'enabled' => $settings ? $settings->telegram_enabled : false,
+            'enabled'   => $settings ? $settings->telegram_enabled : false,
         ]);
     }
 
     /**
      * Send a message via Telegram Bot API
      */
-    private function sendTelegramMessage(string $chatId, string $text)
+    private function sendTelegramMessage(string $chatId, string $text): void
     {
         $token = config('services.telegram-bot-api.token');
 
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-            'chat_id' => $chatId,
-            'text' => $text,
+        Http::post(sprintf('https://api.telegram.org/bot%s/sendMessage', $token), [
+            'chat_id'    => $chatId,
+            'text'       => $text,
             'parse_mode' => 'Markdown',
         ]);
     }
@@ -174,7 +177,7 @@ class TelegramController extends Controller
 
         Log::info('token : '.$token);
 
-        $response = Http::get("https://api.telegram.org/bot{$token}/getMe");
+        $response = Http::get(sprintf('https://api.telegram.org/bot%s/getMe', $token));
 
         if ($response->successful()) {
             return $response->json('result.username');

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -12,8 +14,9 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -37,6 +40,16 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function moodEntries(): HasMany
+    {
+        return $this->hasMany(MoodEntry::class);
+    }
+
+    public function notificationSetting(): HasOne
+    {
+        return $this->hasOne(NotificationSetting::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -46,18 +59,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'timezone' => 'string',
+            'password'          => 'hashed',
+            'timezone'          => 'string',
         ];
-    }
-
-    public function moodEntries(): HasMany
-    {
-        return $this->hasMany(MoodEntry::class);
-    }
-
-    public function notificationSetting(): HasOne
-    {
-        return $this->hasOne(NotificationSetting::class);
     }
 }
