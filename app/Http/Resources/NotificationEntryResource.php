@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -15,16 +17,16 @@ class NotificationEntryResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->getKey(),
-            'user_id' => $this->user_id,
-            'morning_time' => $this->morning_time,
-            'afternoon_time' => $this->afternoon_time,
-            'evening_time' => $this->evening_time,
-            'morning_enabled' => $this->morning_enabled,
+            'id'                => $this->getKey(),
+            'user_id'           => $this->user_id,
+            'morning_time'      => $this->morning_time,
+            'afternoon_time'    => $this->afternoon_time,
+            'evening_time'      => $this->evening_time,
+            'morning_enabled'   => $this->morning_enabled,
             'afternoon_enabled' => $this->afternoon_enabled,
-            'evening_enabled' => $this->evening_enabled,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'evening_enabled'   => $this->evening_enabled,
+            'created_at'        => $this->created_at,
+            'updated_at'        => $this->updated_at,
         ];
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -11,15 +13,15 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validatedData = $request->validate([
-            'name' => 'required|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-            'timezone' => 'nullable|string|max:255',
+            'name'     => ['required', 'max:255'],
+            'email'    => ['required', 'email', 'unique:users'],
+            'password' => ['required', 'min:6'],
+            'timezone' => ['nullable', 'string', 'max:255'],
         ]);
 
         $user = User::query()->create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
+            'name'     => $validatedData['name'],
+            'email'    => $validatedData['email'],
             'password' => Hash::make($validatedData['password']),
             'timezone' => $validatedData['timezone'] ?? 'UTC',
         ]);
@@ -28,15 +30,15 @@ class AuthController extends Controller
 
         return response()->json([
             'access_token' => $token,
-            'token_type' => 'Bearer',
+            'token_type'   => 'Bearer',
         ]);
     }
 
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'email'    => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
         $user = User::query()->where('email', $request->email)->first();
@@ -49,7 +51,7 @@ class AuthController extends Controller
 
         return response()->json([
             'access_token' => $token,
-            'token_type' => 'Bearer',
+            'token_type'   => 'Bearer',
         ]);
     }
 

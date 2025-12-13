@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Http\Controllers\Api\TelegramController;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 
 class TelegramPolling extends Command
 {
@@ -23,15 +27,15 @@ class TelegramPolling extends Command
         $token = config('services.telegram-bot-api.token');
 
         // Disable webhook (because polling and webhook don't work together)
-        Http::post("https://api.telegram.org/bot{$token}/deleteWebhook");
+        Http::post(sprintf('https://api.telegram.org/bot%s/deleteWebhook', $token));
 
         $this->info('Webhook disabled, polling active');
 
         while (true) {
             try {
                 // Request new messages from Telegram
-                $response = Http::get("https://api.telegram.org/bot{$token}/getUpdates", [
-                    'offset' => $this->offset,
+                $response = Http::get(sprintf('https://api.telegram.org/bot%s/getUpdates', $token), [
+                    'offset'  => $this->offset,
                     'timeout' => 60, // Wait 60 seconds for new messages
                 ]);
 
@@ -47,9 +51,9 @@ class TelegramPolling extends Command
                     $this->offset = $update['update_id'] + 1;
                 }
 
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->error('Error: '.$e->getMessage());
-                sleep(5);
+                Sleep::sleep(5);
             }
         }
     }
@@ -60,7 +64,7 @@ class TelegramPolling extends Command
         $request = Request::create('/api/telegram/webhook', 'POST', $update);
 
         // Call the same webhook method
-        $controller = app(TelegramController::class);
+        $controller = resolve(TelegramController::class);
         $controller->webhook($request);
     }
 }

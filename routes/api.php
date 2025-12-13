@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Http\Controllers\Api\TelegramController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MoodEntryController;
@@ -12,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/user', function (Request $request) {
@@ -29,15 +31,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/notification-settings/update', [NotificationSettingController::class, 'update'])->name('notification-settings.update');
 
     // Telegram
-    Route::prefix('telegram')->group(function () {
+    Route::prefix('telegram')->group(function (): void {
         Route::get('/status', [TelegramController::class, 'status']);
         Route::post('/generate-link', [TelegramController::class, 'generateLinkCode']);
         Route::post('/disconnect', [TelegramController::class, 'disconnect']);
         Route::post('/send-message', [TelegramController::class, 'sendTelegramMessage']);
     });
 
-    Route::get('/test-notification', function () {
-        $user = User::first();
+    Route::get('/test-notification', function (): string {
+        $user = User::query()->first();
         $user->notify(new MoodReminderNotification('morning'));
 
         return 'Notifications sent!';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mood_entries', function (Blueprint $table) {
+        Schema::create('mood_entries', function (Blueprint $table): void {
             $table->id();
             $table->string('user_id')->constrained()->onDelete('cascade');
             $table->tinyInteger('mood_score'); // e.g., 1-5 scale
