@@ -1,0 +1,14 @@
+includes:
+  - vendor/larastan/larastan/extension.neon
+  - vendor/tomasvotruba/cognitive-complexity/config/extension.neon
+
+parameters:
+    paths:
+        - app
+        - database
+    level: 5
+    cognitive_complexity:
+        class: 85
+        function: 8
+    ignoreErrors:
+        - '#PHPDoc tag @mixin contains unknown class App\\Models\\IdeHelper#'
