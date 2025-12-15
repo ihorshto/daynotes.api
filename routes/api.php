@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Actions\Telegram\WebhookAction;
 use App\Http\Controllers\Api\TelegramController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MoodEntryController;
@@ -46,4 +47,4 @@ Route::middleware('auth:sanctum')->group(function (): void {
     });
 });
 
-Route::post('/telegram/webhook', [TelegramController::class, 'webhook']);
+Route::post('/telegram/webhook', WebhookAction::class)->name('telegram.webhook');
