@@ -17,7 +17,6 @@ class MoodEntry extends Model
     protected $fillable = [
         'user_id',
         'mood_score',
-        'time_of_day',
         'note',
     ];
 
@@ -30,7 +29,6 @@ class MoodEntry extends Model
     {
         return [
             'mood_score'  => MoodScore::class,
-            'time_of_day' => 'string',
             'user_id'     => 'integer',
             'note'        => 'string',
         ];

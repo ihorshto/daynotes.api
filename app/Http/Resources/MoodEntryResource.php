@@ -20,7 +20,6 @@ class MoodEntryResource extends JsonResource
             'id'          => $this->getKey(),
             'user_id'     => $this->user_id,
             'mood_score'  => $this->mood_score,
-            'time_of_day' => $this->time_of_day,
             'note'        => $this->note,
             'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,

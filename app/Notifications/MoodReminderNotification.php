@@ -46,7 +46,6 @@ class MoodReminderNotification extends Notification
         return [
             'title'       => $this->getTitle(),
             'message'     => $this->getMessage(),
-            'time_of_day' => $this->timeOfDay,
             'type'        => 'mood_reminder',
         ];
     }
