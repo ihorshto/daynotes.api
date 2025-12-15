@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Telegram;
 
-use App\Http\Controllers\Api\TelegramController;
+use App\Actions\Telegram\WebhookAction;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\Request;
@@ -64,7 +64,7 @@ class TelegramPolling extends Command
         $request = Request::create('/api/telegram/webhook', 'POST', $update);
 
         // Call the same webhook method
-        $controller = resolve(TelegramController::class);
-        $controller->webhook($request);
+        $controller = resolve(WebhookAction::class);
+        $controller->execute($request);
     }
 }
