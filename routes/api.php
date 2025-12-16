@@ -22,11 +22,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         return $request->user();
     });
 
-    Route::get('/mood-entries', [MoodEntryController::class, 'index']);
-    Route::get('/mood-entries/{moodEntry}', [MoodEntryController::class, 'show']);
-    Route::post('/mood-entries/create', [MoodEntryController::class, 'create']);
-    Route::post('/mood-entries/{moodEntry}/update', [MoodEntryController::class, 'update']);
-    Route::delete('/mood-entries/{moodEntry}/destroy', [MoodEntryController::class, 'destroy']);
+    Route::resource('mood-entries', MoodEntryController::class)->except('edit', 'create');
 
     // Notification Settings
     Route::post('/notification-settings/update', [NotificationSettingController::class, 'update'])->name('notification-settings.update');
