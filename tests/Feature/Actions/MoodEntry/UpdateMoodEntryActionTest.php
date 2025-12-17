@@ -6,7 +6,6 @@ use App\Enums\MoodScore;
 use App\Models\MoodEntry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -61,9 +60,6 @@ describe('Update Mood Entry', function (): void {
         ];
 
         $response = $this->patchJson(route('mood-entries.update', $this->moodEntry->getKey()), $updatedData);
-
-        Log::info('Status: '.$response->status());
-        Log::info($response->getContent());
 
         $response->assertSuccessful()
             ->assertJsonStructure([
@@ -130,7 +126,7 @@ describe('Update Mood Entry', function (): void {
         ];
 
         $response = $this->patchJson(route('mood-entries.update', $this->moodEntry->getKey()), $updatedData);
-        Log::info('resposen: '.$response->status());
+
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJsonValidationErrors(['mood_score']);
 
