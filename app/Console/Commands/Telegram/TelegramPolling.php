@@ -13,16 +13,29 @@ use Illuminate\Support\Sleep;
 
 class TelegramPolling extends Command
 {
-    protected $signature = 'telegram:polling';
+    protected $signature = 'telegram:polling {--timeout=60 : Polling timeout in seconds}';
 
     protected $description = 'Receive messages from Telegram via polling';
 
     private int $offset = 0;
 
+    private bool $shouldKeepRunning = true;
+
+    private int $errorCount = 0;
+
     public function handle(): void
     {
-        $this->info('🚀 Starting Telegram polling...');
+        $this->info('Starting Telegram polling...');
         $this->info('Press Ctrl+C to stop');
+
+        $timeout = (int) $this->option('timeout');
+        $this->info(sprintf('Polling timeout: %d seconds', $timeout));
+
+        // Register signal handlers for graceful shutdown
+        $this->trap([SIGTERM, SIGINT], function (): void {
+            $this->shouldKeepRunning = false;
+            $this->info('Gracefully shutting down...');
+        });
 
         $token = config('services.telegram-bot-api.token');
 
@@ -31,18 +44,18 @@ class TelegramPolling extends Command
 
         $this->info('Webhook disabled, polling active');
 
-        while (true) {
+        while ($this->shouldKeepRunning) {
             try {
                 // Request new messages from Telegram
                 $response = Http::get(sprintf('https://api.telegram.org/bot%s/getUpdates', $token), [
                     'offset'  => $this->offset,
-                    'timeout' => 60, // Wait 60 seconds for new messages
+                    'timeout' => $timeout,
                 ]);
 
                 $updates = $response->json('result', []);
 
                 foreach ($updates as $update) {
-                    $this->info('📨 New message: '.json_encode($update));
+                    $this->info("\n New message: ".json_encode($update));
 
                     // Process each message
                     $this->processUpdate($update);
@@ -51,17 +64,29 @@ class TelegramPolling extends Command
                     $this->offset = $update['update_id'] + 1;
                 }
 
+                // Reset error count on successful poll
+                $this->errorCount = 0;
+
             } catch (Exception $e) {
+                $this->errorCount++;
+
+                // Exponential backoff: 2, 4, 8, 16, 32, 60 (max)
+                $sleepTime = min(60, pow(2, $this->errorCount));
+
                 $this->error('Error: '.$e->getMessage());
-                Sleep::sleep(5);
+                $this->warn(sprintf('Retrying in %s seconds... (attempt %d)', $sleepTime, $this->errorCount));
+
+                Sleep::sleep((int) $sleepTime);
             }
         }
+
+        $this->info('Telegram polling stopped gracefully');
     }
 
     private function processUpdate(array $update): void
     {
         // Create fake request with data from Telegram
-        $request = Request::create('/api/telegram/webhook', 'POST', $update);
+        $request = Request::create(route('telegram.webhook'), 'POST', $update);
 
         // Call the same webhook method
         $controller = resolve(WebhookAction::class);
