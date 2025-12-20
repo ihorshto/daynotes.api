@@ -18,11 +18,11 @@ class NotificationSettingController extends Controller
     {
         $validated = $request->validated();
 
-        $this->updateNotificationSettingAction->execute(
+        $notificationSetting = $this->updateNotificationSettingAction->execute(
             $request->user(),
             $validated,
         );
 
-        return NotificationEntryResource::make($request->user()->notificationSetting);
+        return NotificationEntryResource::make($notificationSetting);
     }
 }

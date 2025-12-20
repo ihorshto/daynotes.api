@@ -25,6 +25,8 @@ class NotificationEntryResource extends JsonResource
             'morning_enabled'   => $this->morning_enabled,
             'afternoon_enabled' => $this->afternoon_enabled,
             'evening_enabled'   => $this->evening_enabled,
+            'email_enabled'     => $this->email_enabled,
+            'telegram_enabled'  => $this->telegram_enabled,
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,
         ];
