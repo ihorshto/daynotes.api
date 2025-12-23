@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Pre-commit hook to run code quality tools
+# Based on the original Husky pre-commit hook
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+GIT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Save the list of staged files
+cd "$GIT_ROOT"
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Run code quality tools
+cd "$PROJECT_ROOT" && docker compose -f dev-docker-compose.yml exec -T app composer rector:fix
+cd "$PROJECT_ROOT" && docker compose -f dev-docker-compose.yml exec -T app composer pint:fix
+cd "$PROJECT_ROOT" && docker compose -f dev-docker-compose.yml exec -T app npm run prettier:fix
+
+# Re-add only the files that were originally staged
+cd "$GIT_ROOT"
+echo "$STAGED_FILES" | while IFS= read -r file; do
+    if [ -n "$file" ] && [ -f "$file" ]; then
+        git add "$file"
+    fi
+done

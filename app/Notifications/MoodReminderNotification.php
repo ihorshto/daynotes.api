@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
@@ -12,9 +14,12 @@ class MoodReminderNotification extends Notification
     use Queueable;
 
     public function __construct(
-        private readonly string $timeOfDay
+        private readonly string $timeOfDay,
     ) {}
 
+    /**
+     * @return string[]
+     */
     public function via($notifiable): array
     {
         $channels = [];
@@ -33,13 +38,15 @@ class MoodReminderNotification extends Notification
         return $channels;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function toDatabase($notifiable): array
     {
         return [
-            'title' => $this->getTitle(),
-            'message' => $this->getMessage(),
-            'time_of_day' => $this->timeOfDay,
-            'type' => 'mood_reminder',
+            'title'       => $this->getTitle(),
+            'message'     => $this->getMessage(),
+            'type'        => 'mood_reminder',
         ];
     }
 
@@ -73,20 +80,20 @@ class MoodReminderNotification extends Notification
     private function getTitle(): string
     {
         return match ($this->timeOfDay) {
-            'morning' => 'Good morning! 🌅',
+            'morning'   => 'Good morning! 🌅',
             'afternoon' => 'Good afternoon! ☀️',
-            'evening' => 'Good evening! 🌙',
-            default => 'Reminder',
+            'evening'   => 'Good evening! 🌙',
+            default     => 'Reminder',
         };
     }
 
     private function getMessage(): string
     {
         return match ($this->timeOfDay) {
-            'morning' => 'How are you feeling today?',
+            'morning'   => 'How are you feeling today?',
             'afternoon' => 'How is your day going?',
-            'evening' => 'How was your day?',
-            default => 'Time to record your mood!',
+            'evening'   => 'How was your day?',
+            default     => 'Time to record your mood!',
         };
     }
 }
