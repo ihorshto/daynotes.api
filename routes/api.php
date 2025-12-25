@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\Actions\Telegram\WebhookAction;
 use App\Http\Controllers\Api\TelegramController;
+use App\Http\Controllers\Api\UserNotificationSettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MoodEntryController;
-use App\Http\Controllers\NotificationSettingController;
 use App\Models\User;
 use App\Notifications\MoodReminderNotification;
 use Illuminate\Http\Request;
@@ -25,7 +25,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::resource('mood-entries', MoodEntryController::class)->except('edit', 'create');
 
     // Notification Settings
-    Route::post('/notification-settings/update', [NotificationSettingController::class, 'update'])->name('notification-settings.update');
+    Route::post('/notification-settings/store', [UserNotificationSettingController::class, 'store'])->name('notification-settings.store');
+    Route::put('/notification-settings/{userNotificationSetting}/update', [UserNotificationSettingController::class, 'update'])->name('notification-settings.update');
 
     // Telegram
     Route::prefix('telegram')->group(function (): void {

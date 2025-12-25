@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\NotificationSetting;
+use App\Models\UserNotificationSetting;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<NotificationSetting>
+ * @extends Factory<UserNotificationSetting>
  */
 class NotificationSettingFactory extends Factory
 {
@@ -21,12 +21,7 @@ class NotificationSettingFactory extends Factory
     {
         return [
             'user_id'           => fake()->numberBetween(1, 10),
-            'morning_time'      => fake()->time(),
-            'afternoon_time'    => fake()->time(),
-            'evening_time'      => fake()->time(),
-            'morning_enabled'   => fake()->boolean(),
-            'afternoon_enabled' => fake()->boolean(),
-            'evening_enabled'   => fake()->boolean(),
+            'time'              => fake()->time(),
             'email_enabled'     => fake()->boolean(),
             'telegram_enabled'  => fake()->boolean(),
         ];
