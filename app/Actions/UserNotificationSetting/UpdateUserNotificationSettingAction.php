@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Actions\NotificationSetting;
+namespace App\Actions\UserNotificationSetting;
 
-use App\Models\User;
 use App\Models\UserNotificationSetting;
 
-class StoreUserNotificationSettingAction
+class UpdateUserNotificationSettingAction
 {
     /**
      * @param  array<string, mixed>  $data
      */
-    public function execute(User $user, array $data): UserNotificationSetting
+    public function execute(UserNotificationSetting $notificationSetting, array $data): UserNotificationSetting
     {
-        return UserNotificationSetting::query()->create(
+        $notificationSetting->update(
             [
-                'user_id'           => $user->id,
                 'time'              => $data['time'],
                 'email_enabled'     => $data['email_enabled'],
                 'telegram_enabled'  => $data['telegram_enabled'],
             ]
         );
+
+        return $notificationSetting;
     }
 }

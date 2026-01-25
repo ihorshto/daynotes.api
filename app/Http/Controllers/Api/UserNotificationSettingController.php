@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
-use App\Actions\NotificationSetting\StoreUserNotificationSettingAction;
-use App\Actions\NotificationSetting\UpdateUserNotificationSettingAction;
+use App\Actions\UserNotificationSetting\StoreUserNotificationSettingAction;
+use App\Actions\UserNotificationSetting\UpdateUserNotificationSettingAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserNotificationSettingRequest;
 use App\Http\Resources\NotificationEntryResource;
