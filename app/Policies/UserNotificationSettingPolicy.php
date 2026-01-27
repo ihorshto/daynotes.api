@@ -13,4 +13,9 @@ class UserNotificationSettingPolicy
     {
         return $user->id === $userNotificationSetting->user_id;
     }
+
+    public function update(User $user, UserNotificationSetting $userNotificationSetting): bool
+    {
+        return $user->id === $userNotificationSetting->user_id;
+    }
 }

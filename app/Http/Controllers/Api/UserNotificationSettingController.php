@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UserNotificationSettingRequest;
 use App\Http\Resources\NotificationEntryResource;
 use App\Models\UserNotificationSetting;
+use Illuminate\Support\Facades\Gate;
 
 class UserNotificationSettingController extends Controller
 {
@@ -32,6 +33,8 @@ class UserNotificationSettingController extends Controller
 
     public function update(UserNotificationSettingRequest $request, UserNotificationSetting $userNotificationSetting): NotificationEntryResource
     {
+        Gate::authorize('update', $userNotificationSetting);
+
         $validated = $request->validated();
 
         $notificationSetting = $this->updateNotificationSettingAction->execute(
