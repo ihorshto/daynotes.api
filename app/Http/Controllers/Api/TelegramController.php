@@ -40,13 +40,16 @@ class TelegramController extends Controller
     public function disconnect(Request $request)
     {
         $user = $request->user();
-        $settings = $user->notificationSetting;
+        $previousTelegramId = $user->telegram_chat_id;
 
-        if ($settings && $settings->telegram_chat_id) {
+        if ($previousTelegramId) {
+            $user->telegram_chat_id = null;
+            $user->save();
+
             // Send a disconnection message
             try {
                 $this->sendTelegramMessage(
-                    $settings->telegram_chat_id,
+                    $previousTelegramId,
                     " *Telegram Notifications Disconnected*\n\n"
                     ."Your Telegram no longer will receive notifications from our app. \n"
                     .'If this was a mistake, you can reconnect anytime from your account settings.'
@@ -54,14 +57,18 @@ class TelegramController extends Controller
             } catch (Exception $e) {
                 Log::error('Failed to send Telegram disconnection message: '.$e->getMessage());
             }
+
+            return response()->json([
+                'ok'      => true,
+                'message' => 'Telegram disconnected successfully',
+            ]);
         }
 
-        $user->notificationSetting()->update([
-            'telegram_chat_id' => null,
-            'telegram_enabled' => false,
+        return response()->json([
+            'ok'      => false,
+            'message' => 'Telegram is not connected.',
         ]);
 
-        return response()->json(['message' => 'Telegram успішно відключено']);
     }
 
     /**
