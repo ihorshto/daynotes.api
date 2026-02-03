@@ -80,7 +80,7 @@ class TelegramController extends Controller
         $settings = $user->notificationSetting;
 
         return response()->json([
-            'connected' => $settings && $settings->telegram_enabled && $settings->telegram_chat_id,
+            'connected' => $user->telegram_chat_id !== null,
             'enabled'   => $settings ? $settings->telegram_enabled : false,
         ]);
     }
