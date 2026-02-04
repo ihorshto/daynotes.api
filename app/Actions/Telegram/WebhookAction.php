@@ -9,7 +9,6 @@ use App\Models\User;
 use App\Services\TelegramService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsController;
 
@@ -20,6 +19,7 @@ class WebhookAction
     public function __construct(
         private readonly CreateMoodEntryAction $createMoodEntryAction,
         private readonly TelegramService $telegramService,
+        private readonly sendTelegramMessage $sendTelegramMessage,
     ) {}
 
     public function execute(Request $request)
@@ -51,7 +51,7 @@ class WebhookAction
         $user = User::query()->where('telegram_chat_id', $chatId)->firstOrFail();
 
         if (! $user) {
-            $this->sendTelegramMessage(
+            $this->sendTelegramMessage->execute(
                 $chatId,
                 '❌ Please link your Telegram account first using /start command.'
             );
@@ -82,7 +82,7 @@ class WebhookAction
             $user->telegram_chat_id = null;
             $user->save();
 
-            $this->sendTelegramMessage(
+            $this->sendTelegramMessage->execute(
                 $chatId,
                 "️✅ *Unlinked Successfully*\n\n"
                 ."Your Mood Tracker account has been unlinked from this Telegram chat. \n\n");
@@ -90,7 +90,7 @@ class WebhookAction
             return response()->json(['ok' => true, 'status' => 'already_linked']);
         }
 
-        $this->sendTelegramMessage(
+        $this->sendTelegramMessage->execute(
             $chatId,
             "❌ *Not Linked*\n\n"
             ."Your Mood Tracker account is not linked to any Telegram chat. \n\n"
@@ -99,20 +99,6 @@ class WebhookAction
 
         return response()->json(['ok' => true, 'status' => 'not_linked']);
 
-    }
-
-    /**
-     * Send a message via Telegram Bot API
-     */
-    private function sendTelegramMessage(int $chatId, string $text): void
-    {
-        $token = config('services.telegram-bot-api.token');
-
-        Http::post(sprintf('https://api.telegram.org/bot%s/sendMessage', $token), [
-            'chat_id'    => $chatId,
-            'text'       => $text,
-            'parse_mode' => 'Markdown',
-        ]);
     }
 
     /**
@@ -133,7 +119,7 @@ class WebhookAction
                 $user = User::query()->find($userId);
                 if ($user) {
                     if ($user->telegram_chat_id) {
-                        $this->sendTelegramMessage(
+                        $this->sendTelegramMessage->execute(
                             $chatId,
                             "⚠️ *Already Linked*\n\n"
                             ."Your Mood Tracker account is already linked to another Telegram chat. \n\n"
@@ -146,7 +132,7 @@ class WebhookAction
                     $user->telegram_chat_id = $chatId;
                     $user->save();
 
-                    $this->sendTelegramMessage(
+                    $this->sendTelegramMessage->execute(
                         $chatId,
                         "✅ *Congratulations, {$username}!*\n\n"
                         ."Telegram notifications have been successfully linked to your account Mood Tracker! \n\n"
@@ -158,7 +144,7 @@ class WebhookAction
 
                 }
             } else {
-                $this->sendTelegramMessage(
+                $this->sendTelegramMessage->execute(
                     $chatId,
                     "❌ *Code Expired or Invalid*\n\n"
                     ."The link code is valid for 10 minutes only. \n\n"
@@ -170,7 +156,7 @@ class WebhookAction
         } elseif ($text === '/start') {
             $chatId = $message['chat']['id'];
 
-            $this->sendTelegramMessage(
+            $this->sendTelegramMessage->execute(
                 $chatId,
                 "👋 *Hi!*\n\n"
                 ."It's a Mood Tracker Bot.\n\n"
@@ -197,7 +183,7 @@ class WebhookAction
 
             cache()->put($cacheKey, $moodEntry->id, now()->addMinutes(30));
 
-            $this->sendTelegramMessage(
+            $this->sendTelegramMessage->execute(
                 $chatId,
                 "✅ Your mood has been saved!\n\n"
                 .'Would you like to add a note? Just type it now, or send another number to log a new mood.'
@@ -213,7 +199,7 @@ class WebhookAction
                 $moodEntry->update(['note' => $text]);
                 cache()->forget($cacheKey);
 
-                $this->sendTelegramMessage(
+                $this->sendTelegramMessage->execute(
                     $chatId,
                     '📝 Note added to your mood entry!'
                 );
@@ -224,7 +210,7 @@ class WebhookAction
 
         cache()->forget($cacheKey);
 
-        $this->sendTelegramMessage(
+        $this->sendTelegramMessage->execute(
             $chatId,
             'Please enter a number from *1 to 5* to log your mood.'
         );
