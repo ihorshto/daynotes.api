@@ -6,6 +6,7 @@ use App\Actions\Telegram\WebhookAction;
 use App\Actions\UserNotificationSetting\GetUserNotificationSettingAction;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MoodEntryController;
+use App\Http\Controllers\Api\MoodStatisticController;
 use App\Http\Controllers\Api\TelegramController;
 use App\Http\Controllers\Api\UserNotificationSettingController;
 use App\Models\User;
@@ -24,6 +25,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     });
 
     Route::resource('mood-entries', MoodEntryController::class)->except('edit', 'create');
+
+    Route::post('/mood-entries/statistics', [MoodStatisticController::class, 'getStatistics'])->name('mood-entries.getStatistics');
 
     // Notification Settings
     Route::post('/notification-settings/store', [UserNotificationSettingController::class, 'store'])->name('notification-settings.store');
