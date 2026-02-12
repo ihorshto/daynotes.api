@@ -14,9 +14,9 @@ class StoreUserNotificationSettingAction
      */
     public function execute(User $user, array $data): UserNotificationSetting
     {
-        return UserNotificationSetting::query()->firstOrCreate(
-            ['user_id' => $user->id],
+        return UserNotificationSetting::query()->create(
             [
+                'user_id'           => $user->id,
                 'time'              => $data['time'],
                 'email_enabled'     => $data['email_enabled'],
                 'telegram_enabled'  => $data['telegram_enabled'],
