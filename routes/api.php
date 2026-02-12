@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Actions\Telegram\WebhookAction;
-use App\Actions\UserNotificationSetting\GetOneUserNotificationSettingAction;
+use App\Actions\UserNotificationSetting\GetUserNotificationSettingAction;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MoodEntryController;
 use App\Http\Controllers\Api\TelegramController;
@@ -28,7 +28,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     // Notification Settings
     Route::post('/notification-settings/store', [UserNotificationSettingController::class, 'store'])->name('notification-settings.store');
     Route::put('/notification-settings/{userNotificationSetting}/update', [UserNotificationSettingController::class, 'update'])->name('notification-settings.update');
-    Route::get('/notification-settings/{userNotificationSetting}', GetOneUserNotificationSettingAction::class)->name('notification-settings.getOne');
+    Route::delete('/notification-settings/{userNotificationSetting}/delete', [UserNotificationSettingController::class, 'delete'])->name('notification-settings.delete');
+    Route::get('/notification-settings/{userNotificationSetting}', GetUserNotificationSettingAction::class)->name('notification-settings.getOne');
 
     // Telegram
     Route::prefix('telegram')->group(function (): void {

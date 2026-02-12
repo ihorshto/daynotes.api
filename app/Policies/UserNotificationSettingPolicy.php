@@ -18,4 +18,9 @@ class UserNotificationSettingPolicy
     {
         return $user->id === $userNotificationSetting->user_id;
     }
+
+    public function delete(User $user, UserNotificationSetting $userNotificationSetting): bool
+    {
+        return $this->update($user, $userNotificationSetting);
+    }
 }
