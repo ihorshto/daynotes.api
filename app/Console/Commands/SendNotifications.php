@@ -48,7 +48,7 @@ class SendNotifications extends Command
                     if ($setting->telegram_enabled) {
                         $sendTelegramMessage->execute(
                             (int) $user->telegram_chat_id,
-                            sprintf('⏰ This is your mood reminder for the %s!', $settingTime)
+                            '⏰ This is your mood reminder for writing your mood entry 😊'
                         );
                     }
 

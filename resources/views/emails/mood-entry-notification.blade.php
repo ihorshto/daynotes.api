@@ -15,7 +15,7 @@
         </div>
         <div style="padding: 32px;">
             <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: #3f3f46;">Hello {{ $mailData['name'] }},</p>
-            <p style="margin: 0; font-size: 16px; line-height: 1.5; color: #3f3f46;">Please write your mood entry for {{ $mailData['time'] }}.</p>
+            <p style="margin: 0; font-size: 16px; line-height: 1.5; color: #3f3f46;">Please write your mood entry 😊</p>
         </div>
         <div style="padding: 20px 32px; background-color: #fafafa; text-align: center;">
             <p style="margin: 0; font-size: 14px; color: #71717a;">Thank you for using Daynotes!</p>
