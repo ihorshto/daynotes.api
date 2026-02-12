@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\UserNotificationSetting;
 
+use App\Http\Resources\NotificationEntryResource;
 use App\Models\UserNotificationSetting;
 use Lorisleiva\Actions\Concerns\AsController;
 
@@ -11,10 +12,8 @@ class GetUserNotificationSettingAction
 {
     use AsController;
 
-    public function handle(UserNotificationSetting $userNotificationSetting): UserNotificationSetting
+    public function handle(UserNotificationSetting $userNotificationSetting): NotificationEntryResource
     {
-        return UserNotificationSetting::query()
-            ->where('id', $userNotificationSetting->id)
-            ->first();
+        return NotificationEntryResource::make($userNotificationSetting);
     }
 }
