@@ -139,7 +139,7 @@ describe('Create Notification Setting', function (): void {
             ->assertJsonValidationErrors(['time']);
     });
 
-    it('fails in double creating, when notification setting already exists for user, returns existing one', function (): void {
+    it('success in double creating', function (): void {
         Sanctum::actingAs($this->user);
 
         $data = [
@@ -149,12 +149,8 @@ describe('Create Notification Setting', function (): void {
         ];
 
         // First creation
-        $this->postJson(route('notification-settings.store'), $data);
-
-        // Attempt to create again
-        $response = $this->postJson(route('notification-settings.store'), $data);
-
-        $response->assertSuccessful()
+        $response1 = $this->postJson(route('notification-settings.store'), $data);
+        $response1->assertSuccessful()
             ->assertJsonStructure([
                 'data' => [
                     'id',
@@ -167,6 +163,21 @@ describe('Create Notification Setting', function (): void {
                 ],
             ]);
 
-        $this->assertDatabaseCount('user_notification_settings', 1);
+        // Attempt to create again with the same data
+        $response2 = $this->postJson(route('notification-settings.store'), $data);
+        $response2->assertSuccessful()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'time',
+                    'user_id',
+                    'email_enabled',
+                    'telegram_enabled',
+                    'created_at',
+                    'updated_at',
+                ],
+            ]);
+
+        $this->assertDatabaseCount('user_notification_settings', 2);
     });
 });
