@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Actions\Telegram\SendTelegramMessage;
 use App\Exceptions\TelegramMessageException;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,7 +18,7 @@ describe('SendTelegramMessage Action', function (): void {
         $sendTelegramMessage = new SendTelegramMessage;
         $sendTelegramMessage->execute($chatId, $testMessage);
 
-        Http::assertSent(function (array $request) use ($chatId, $testMessage): bool {
+        Http::assertSent(function (Request $request) use ($chatId, $testMessage): bool {
             return $request->url() === 'https://api.telegram.org/bot'.config('services.telegram-bot-api.token').'/sendMessage'
                    && $request->method() === 'POST'
                    && $request['chat_id'] === $chatId
