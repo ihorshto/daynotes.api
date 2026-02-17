@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Enums;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 
 enum StatsPeriod: string
 {
@@ -16,8 +15,6 @@ enum StatsPeriod: string
     public static function fromCommand(string $text): ?self
     {
         $period = str_replace('/stats_', '', $text);
-
-        Log::info('period'.$period);
 
         return self::tryFrom($period);
     }
