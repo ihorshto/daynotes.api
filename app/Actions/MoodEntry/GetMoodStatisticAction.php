@@ -28,7 +28,7 @@ class GetMoodStatisticAction
             ];
         }
 
-        $averageMood = $moodEntries->avg(fn (MoodEntry $entry) => $entry->mood_score->value);
+        $averageMood = round($moodEntries->avg(fn (MoodEntry $entry) => $entry->mood_score->value), 2);
         $countMood = count($moodEntries);
         $minMood = $moodEntries->min(fn (MoodEntry $entry) => $entry->mood_score->value);
         $maxMood = $moodEntries->max(fn (MoodEntry $entry) => $entry->mood_score->value);
