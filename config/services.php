@@ -40,4 +40,8 @@ return [
     'telegram-bot-api' => [
         'token' => env('TELEGRAM_BOT_TOKEN'),
     ],
+
+    'n8n' => [
+        'url' => env('N8N_URL', 'http://n8n:5678'),
+    ],
 ];

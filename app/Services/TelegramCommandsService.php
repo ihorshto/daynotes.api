@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Actions\Telegram\Commands\HandleAnalyticsCommandAction;
 use App\Actions\Telegram\Commands\HandleStartCommandAction;
 use App\Actions\Telegram\Commands\HandleStatsCommandAction;
 use App\Actions\Telegram\Commands\HandleUnLinkCommandAction;
@@ -15,6 +16,7 @@ readonly class TelegramCommandsService
         private HandleStartCommandAction $handleStartCommandAction,
         private HandleUnLinkCommandAction $handleUnLinkCommand,
         private HandleStatsCommandAction $handleStatsCommand,
+        private HandleAnalyticsCommandAction $handleAnalyticsCommand,
     ) {}
 
     public function getCommandResponse(array $message, $text): JsonResponse
@@ -33,6 +35,12 @@ readonly class TelegramCommandsService
 
         if (str_starts_with($text, '/stats_')) {
             $this->handleStatsCommand->handle($message);
+
+            return response()->json(['ok' => true]);
+        }
+
+        if (str_starts_with($text, '/analytics_')) {
+            $this->handleAnalyticsCommand->handle($message);
 
             return response()->json(['ok' => true]);
         }
