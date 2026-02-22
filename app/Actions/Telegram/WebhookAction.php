@@ -38,6 +38,7 @@ class WebhookAction
         if (str_starts_with($text, '/')) {
             return $this->telegramCommandsService->getCommandResponse($message, $text);
         }
+
         // Find User
         $user = User::query()->where('telegram_chat_id', $chatId)->firstOrFail();
         if (! $user) {
@@ -48,6 +49,7 @@ class WebhookAction
 
             return response()->json(['ok' => true]);
         }
+
         // Handle state
         $this->handleUserState($user, $text, $chatId);
 
