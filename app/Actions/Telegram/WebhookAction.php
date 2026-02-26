@@ -23,7 +23,7 @@ class WebhookAction
         private readonly TelegramCommandsService $telegramCommandsService,
     ) {}
 
-    public function execute(Request $request): JsonResponse
+    public function handle(Request $request): JsonResponse
     {
         $update = $request->all();
 
