@@ -7,6 +7,31 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Setup
+
+### Telegram Webhook via ngrok
+
+The `start-ngrok.sh` script automates local Telegram webhook registration. It
+starts ngrok, retrieves the public HTTPS URL, updates `NGROK_URL` in `.env`,
+clears the config cache, and registers the webhook with Telegram.
+
+**Make the script executable (one-time):**
+
+```bash
+chmod +x scripts/start-ngrok.sh
+```
+
+**Run the script:**
+
+```bash
+./start-ngrok.sh
+```
+
+> Requires [ngrok](https://ngrok.com/) to be installed and your
+> `TELEGRAM_BOT_TOKEN` set in `.env`.
+
+---
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We

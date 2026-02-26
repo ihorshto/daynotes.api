@@ -44,4 +44,8 @@ return [
     'n8n' => [
         'url' => env('N8N_URL', 'http://n8n:5678'),
     ],
+
+    'ngrok' => [
+        'url' => env('NGROK_URL'),
+    ],
 ];
