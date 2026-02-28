@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Actions\Telegram\WebhookAction;
 use App\Actions\UserNotificationSetting\GetUserNotificationSettingAction;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MoodEntryController;
@@ -50,4 +49,4 @@ Route::middleware('auth:sanctum')->group(function (): void {
     });
 });
 
-Route::post('/telegram/webhook', WebhookAction::class)->name('telegram.webhook');
+Route::post('/telegram/webhook', [TelegramController::class, 'webhook']);

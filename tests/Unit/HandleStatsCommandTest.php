@@ -3,40 +3,31 @@
 declare(strict_types=1);
 
 use App\Actions\MoodEntry\GetMoodStatisticAction;
-use App\Actions\Telegram\Commands\HandleStatsCommandAction;
+use App\Actions\Telegram\Commands\StatsCommand;
 use App\Enums\StatsPeriod;
 use App\Models\User;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 
-/**
- * @return array<string, string|array<string, int>>
- */
-function makeTelegramMessage(string $text, int $chatId = 602882484): array
-{
-    return [
-        'text' => $text,
-        'chat' => ['id' => $chatId],
-    ];
-}
-
-describe('Handle statistic command', function (): void {
+describe('StatsCommand', function (): void {
 
     it('sends formatted statistics for valid commands', function (string $command, StatsPeriod $period): void {
         Http::fake();
         $chatId = 602882484;
-        User::factory()->create(['telegram_chat_id' => $chatId]);
+        $user = User::factory()->create(['telegram_chat_id' => $chatId]);
 
         $this->mock(GetMoodStatisticAction::class)
             ->shouldReceive('execute')
             ->once()
             ->andReturn(['average' => 3.5, 'count' => 5, 'min' => 1, 'max' => 5]);
 
-        $response = resolve(HandleStatsCommandAction::class)->handle(
-            makeTelegramMessage($command, $chatId)
-        );
+        $update = ['message' => ['text' => $command, 'chat' => ['id' => $chatId]]];
 
-        expect($response->getData(true))->toBe(['ok' => true]);
+        resolve(StatsCommand::class, [
+            'chatId' => (string) $chatId,
+            'user'   => $user,
+            'update' => $update,
+        ])->handle();
 
         Http::assertSent(function (Request $request) use ($chatId, $period): bool {
             return $request['chat_id'] === $chatId
@@ -54,51 +45,59 @@ describe('Handle statistic command', function (): void {
     it('sends no entries message when count is zero', function (): void {
         Http::fake();
         $chatId = 602882484;
-        User::factory()->create(['telegram_chat_id' => $chatId]);
+        $user = User::factory()->create(['telegram_chat_id' => $chatId]);
 
         $this->mock(GetMoodStatisticAction::class)
             ->shouldReceive('execute')
             ->once()
             ->andReturn(['average' => 0, 'count' => 0, 'min' => 0, 'max' => 0]);
 
-        $response = resolve(HandleStatsCommandAction::class)->handle(
-            makeTelegramMessage('/stats_daily', $chatId)
-        );
+        $update = ['message' => ['text' => '/stats_daily', 'chat' => ['id' => $chatId]]];
 
-        expect($response->getData(true))->toBe(['ok' => true]);
+        resolve(StatsCommand::class, [
+            'chatId' => (string) $chatId,
+            'user'   => $user,
+            'update' => $update,
+        ])->handle();
 
         Http::assertSent(function (Request $request) use ($chatId): bool {
             return $request['chat_id'] === $chatId
-                && $request['text'] === 'No mood entries found for this period :(';
+                && $request['text'] === 'Немає записів за цей період :(';
         });
     });
 
     it('sends error message for unknown stats command', function (): void {
         Http::fake();
         $chatId = 602882484;
+        $user = User::factory()->create(['telegram_chat_id' => $chatId]);
 
-        $response = resolve(HandleStatsCommandAction::class)->handle(
-            makeTelegramMessage('/stats_yearly', $chatId)
-        );
+        $update = ['message' => ['text' => '/stats_yearly', 'chat' => ['id' => $chatId]]];
 
-        expect($response->getData(true))->toBe(['ok' => true, 'status' => 'unknown_stats_command']);
+        resolve(StatsCommand::class, [
+            'chatId' => (string) $chatId,
+            'user'   => $user,
+            'update' => $update,
+        ])->handle();
 
         Http::assertSent(function (Request $request) use ($chatId): bool {
             return $request['chat_id'] === $chatId
-                && str_contains($request['text'], 'Unknown command');
+                && str_contains($request['text'], 'Невідома команда');
         });
     });
 
-    it('returns user not found when no matching user exists', function (): void {
+    it('sends not linked message when user is null', function (): void {
         Http::fake();
-        $chatId = 602882484;
 
-        $response = resolve(HandleStatsCommandAction::class)->handle(
-            makeTelegramMessage('/stats_daily', $chatId)
-        );
+        $update = ['message' => ['text' => '/stats_daily', 'chat' => ['id' => 999]]];
 
-        expect($response->getData(true))->toBe(['ok' => false, 'status' => 'user_not_found']);
+        resolve(StatsCommand::class, [
+            'chatId' => '999',
+            'user'   => null,
+            'update' => $update,
+        ])->handle();
 
-        Http::assertNothingSent();
+        Http::assertSent(function (Request $request): bool {
+            return str_contains($request['text'], 'не підключено');
+        });
     });
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Telegram\GenerateLinkCodeAction;
+use App\Actions\Telegram\WebhookAction;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Log;
 
 class TelegramController extends Controller
 {
+    public function __construct(
+        private readonly WebhookAction $webhookAction,
+    ) {}
+
     /**
      * Generate a Telegram deep link with a unique code
      */
@@ -83,6 +88,13 @@ class TelegramController extends Controller
             'connected' => $user->telegram_chat_id !== null,
             'enabled'   => $settings ? $settings->telegram_enabled : false,
         ]);
+    }
+
+    public function webhook(Request $request): JsonResponse
+    {
+        $this->webhookAction->handle($request->all());
+
+        return response()->json(['status' => 'ok']);
     }
 
     /**

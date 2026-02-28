@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Actions\Telegram\SendTelegramMessage;
 use App\Enums\MoodScore;
+use App\Enums\UserState;
+use App\Models\MoodEntry;
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 
 class TelegramService
 {
+    public function __construct(
+        private readonly SendTelegramMessage $sendTelegramMessage,
+        private readonly StateManagerService $stateManager,
+    ) {}
+
     /**
      * Get the bot's username from Telegram API
      */
@@ -25,10 +34,58 @@ class TelegramService
         return 'your_bot';
     }
 
-    public function isValidNumber($num): bool
+    public function isValidNumber(mixed $num): bool
     {
         return is_numeric($num)
             && $num >= MoodScore::VERY_BAD->value
             && $num <= MoodScore::VERY_GOOD->value;
+    }
+
+    public function handleState(User $user, ?string $text): void
+    {
+        $state = $this->stateManager->get($user);
+        $chatId = (int) $user->telegram_chat_id;
+
+        switch ($state) {
+
+            case UserState::WaitingForMood:
+
+                if (! $this->isValidNumber($text)) {
+                    $this->sendTelegramMessage->execute($chatId, 'Будь ласка, введи число від 1 до 5.');
+
+                    return;
+                }
+
+                $mood = (int) $text;
+
+                $this->stateManager->set(
+                    $user,
+                    UserState::WaitingForNote,
+                    ['mood_score' => $mood]
+                );
+
+                $this->sendTelegramMessage->execute($chatId, 'Напиши коротку нотатку 📝');
+
+                break;
+
+            case UserState::WaitingForNote:
+
+                $payload = $this->stateManager->getPayload($user);
+
+                MoodEntry::query()->create([
+                    'user_id'    => $user->id,
+                    'mood_score' => $payload['mood_score'],
+                    'note'       => $text,
+                ]);
+
+                $this->stateManager->clear($user);
+
+                $this->sendTelegramMessage->execute($chatId, 'Настрій збережено ✅');
+
+                break;
+
+            default:
+                break;
+        }
     }
 }
