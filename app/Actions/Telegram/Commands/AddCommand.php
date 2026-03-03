@@ -5,23 +5,10 @@ declare(strict_types=1);
 namespace App\Actions\Telegram\Commands;
 
 use App\Actions\Telegram\Command;
-use App\Actions\Telegram\SendTelegramMessage;
-use App\Enums\UserState;
 use App\Models\User;
-use App\Services\StateManagerService;
 
 class AddCommand extends Command
 {
-    public function __construct(
-        string $chatId,
-        ?User $user,
-        array $update,
-        SendTelegramMessage $sendTelegramMessage,
-        private readonly StateManagerService $stateManager,
-    ) {
-        parent::__construct($chatId, $user, $update, $sendTelegramMessage);
-    }
-
     public static function getName(): string
     {
         return '/add';
@@ -35,8 +22,15 @@ class AddCommand extends Command
             return;
         }
 
-        $this->stateManager->set($this->user, UserState::WaitingForMood);
-
-        $this->reply('Обери настрій від 1 до 5 (1 - дуже погано, 5 - відмінно) 🎭');
+        $this->replyWithKeyboard(
+            '🎭 *Як ти себе почуваєш?*',
+            [[
+                ['text' => '1 😢', 'callback_data' => 'mood:1'],
+                ['text' => '2 😞', 'callback_data' => 'mood:2'],
+                ['text' => '3 😐', 'callback_data' => 'mood:3'],
+                ['text' => '4 😊', 'callback_data' => 'mood:4'],
+                ['text' => '5 🎉', 'callback_data' => 'mood:5'],
+            ]]
+        );
     }
 }

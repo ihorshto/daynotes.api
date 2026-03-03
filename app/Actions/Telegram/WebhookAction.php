@@ -14,6 +14,7 @@ class WebhookAction
 
     public function __construct(
         private readonly CommandRouter $commandRouter,
+        private readonly CallbackRouter $callbackRouter,
         private readonly TelegramService $telegramService,
     ) {}
 
@@ -22,12 +23,23 @@ class WebhookAction
      */
     public function handle(array $update): void
     {
-        $message = $update['message'] ?? null;
+        if ($message = $update['message'] ?? null) {
+            $this->handleMessage($message, $update);
 
-        if (! $message) {
             return;
         }
 
+        if ($callbackQuery = $update['callback_query'] ?? null) {
+            $this->handleCallbackQuery($callbackQuery, $update);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $message
+     * @param  array<string, mixed>  $update
+     */
+    private function handleMessage(array $message, array $update): void
+    {
         $text = $message['text'] ?? '';
         $chatId = $message['chat']['id'] ?? null;
 
@@ -46,5 +58,23 @@ class WebhookAction
         if ($user !== null) {
             $this->telegramService->handleState($user, $text);
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $update
+     * @param  array<string, mixed>  $callbackQuery
+     */
+    private function handleCallbackQuery(array $callbackQuery, array $update): void
+    {
+        $chatId = $callbackQuery['message']['chat']['id'] ?? null;
+        $callbackData = $callbackQuery['data'] ?? null;
+
+        if (! $chatId || ! $callbackData) {
+            return;
+        }
+
+        $user = User::query()->where('telegram_chat_id', (string) $chatId)->first();
+
+        $this->callbackRouter->dispatch($callbackData, (string) $chatId, $user, $update);
     }
 }

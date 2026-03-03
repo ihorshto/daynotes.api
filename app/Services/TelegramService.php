@@ -48,26 +48,6 @@ class TelegramService
 
         switch ($state) {
 
-            case UserState::WaitingForMood:
-
-                if (! $this->isValidNumber($text)) {
-                    $this->sendTelegramMessage->execute($chatId, 'Будь ласка, введи число від 1 до 5.');
-
-                    return;
-                }
-
-                $mood = (int) $text;
-
-                $this->stateManager->set(
-                    $user,
-                    UserState::WaitingForNote,
-                    ['mood_score' => $mood]
-                );
-
-                $this->sendTelegramMessage->execute($chatId, 'Напиши коротку нотатку 📝');
-
-                break;
-
             case UserState::WaitingForNote:
 
                 $payload = $this->stateManager->getPayload($user);
