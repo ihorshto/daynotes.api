@@ -14,6 +14,9 @@ NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels \
 
 echo "Ngrok URL: $NGROK_URL"
 
+# Update NGROK_URL in .env
+sed -i "s|^NGROK_URL=.*|NGROK_URL=$NGROK_URL|" .env
+
 # Clear config cache
 php artisan config:clear
 
