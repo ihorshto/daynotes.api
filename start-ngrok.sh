@@ -18,6 +18,6 @@ echo "Ngrok URL: $NGROK_URL"
 php artisan config:clear
 
 # Set Telegram webhook
-php artisan telegram:set-webhook
+php artisan telegram:set-webhook --drop-pending
 
 echo "Script completed."

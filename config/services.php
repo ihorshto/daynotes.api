@@ -38,7 +38,8 @@ return [
     ],
 
     'telegram-bot-api' => [
-        'token' => env('TELEGRAM_BOT_TOKEN'),
+        'token'                   => env('TELEGRAM_BOT_TOKEN'),
+        'stale_message_threshold' => env('TELEGRAM_STALE_MESSAGE_THRESHOLD', 30),
     ],
 
     'n8n' => [

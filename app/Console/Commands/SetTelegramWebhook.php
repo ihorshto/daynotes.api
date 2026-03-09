@@ -14,7 +14,7 @@ class SetTelegramWebhook extends Command
      *
      * @var string
      */
-    protected $signature = 'telegram:set-webhook';
+    protected $signature = 'telegram:set-webhook {--drop-pending : Drop pending updates when setting the webhook}';
 
     /**
      * The console command description.
@@ -31,7 +31,8 @@ class SetTelegramWebhook extends Command
         $url = config('services.ngrok.url').'/api/telegram/webhook';
 
         $response = Http::post('https://api.telegram.org/bot'.config('services.telegram-bot-api.token').'/setWebhook', [
-            'url' => $url,
+            'url'                  => $url,
+            'drop_pending_updates' => (bool) $this->option('drop-pending'),
         ]);
 
         $data = $response->json();

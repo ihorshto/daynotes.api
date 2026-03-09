@@ -6,6 +6,7 @@ namespace App\Actions\Telegram;
 
 use App\Models\User;
 use App\Services\TelegramService;
+use Illuminate\Support\Facades\Date;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class WebhookAction
@@ -24,6 +25,10 @@ class WebhookAction
     public function handle(array $update): void
     {
         if ($message = $update['message'] ?? null) {
+            if ($this->isStaleMessage($message)) {
+                return;
+            }
+
             $this->handleMessage($message, $update);
 
             return;
@@ -32,6 +37,18 @@ class WebhookAction
         if ($callbackQuery = $update['callback_query'] ?? null) {
             $this->handleCallbackQuery($callbackQuery, $update);
         }
+    }
+
+    /** @param array<string, mixed> $message */
+    private function isStaleMessage(array $message): bool
+    {
+        $messageDate = $message['date'] ?? null;
+
+        if (! $messageDate) {
+            return false;
+        }
+
+        return (Date::now()->getTimestamp() - $messageDate) > config('services.telegram-bot-api.stale_message_threshold');
     }
 
     /**
