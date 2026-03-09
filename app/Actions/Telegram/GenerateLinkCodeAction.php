@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Services\TelegramService;
 use Illuminate\Support\Str;
 
-class GenerateLinkCodeAction
+readonly class GenerateLinkCodeAction
 {
     public function __construct(
         private TelegramService $telegramService,

@@ -7,23 +7,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class NotificationSetting extends Model
+class UserNotificationSetting extends Model
 {
     use HasFactory;
 
-    protected $table = 'notification_settings';
+    protected $table = 'user_notification_settings';
 
     protected $fillable = [
         'user_id',
-        'morning_time',
-        'afternoon_time',
-        'evening_time',
-        'morning_enabled',
-        'afternoon_enabled',
-        'evening_enabled',
+        'time',
         'email_enabled',
         'telegram_enabled',
-        'telegram_chat_id',
     ];
 
     public function user()
@@ -38,12 +32,9 @@ class NotificationSetting extends Model
     {
         return [
             'user_id'           => 'integer',
-            'morning_enabled'   => 'boolean',
-            'afternoon_enabled' => 'boolean',
-            'evening_enabled'   => 'boolean',
+            'time'              => 'string',
             'email_enabled'     => 'boolean',
             'telegram_enabled'  => 'boolean',
-            'telegram_chat_id'  => 'string',
         ];
     }
 }

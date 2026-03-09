@@ -38,6 +38,15 @@ return [
     ],
 
     'telegram-bot-api' => [
-        'token' => env('TELEGRAM_BOT_TOKEN'),
+        'token'                   => env('TELEGRAM_BOT_TOKEN'),
+        'stale_message_threshold' => env('TELEGRAM_STALE_MESSAGE_THRESHOLD', 30),
+    ],
+
+    'n8n' => [
+        'url' => env('N8N_URL', 'http://n8n:5678'),
+    ],
+
+    'ngrok' => [
+        'url' => env('NGROK_URL'),
     ],
 ];

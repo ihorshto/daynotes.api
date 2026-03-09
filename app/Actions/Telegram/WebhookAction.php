@@ -5,93 +5,93 @@ declare(strict_types=1);
 namespace App\Actions\Telegram;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use App\Services\TelegramService;
+use Illuminate\Support\Facades\Date;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class WebhookAction
 {
     use AsController;
 
-    public function execute(Request $request)
+    public function __construct(
+        private readonly CommandRouter $commandRouter,
+        private readonly CallbackRouter $callbackRouter,
+        private readonly TelegramService $telegramService,
+    ) {}
+
+    /**
+     * @param  array<string, mixed>  $update
+     */
+    public function handle(array $update): void
     {
-        $update = $request->all();
-
-        // Handle /start command with link code
-        if (isset($update['message']['text'])) {
-            $text = $update['message']['text'];
-
-            if (str_starts_with($text, '/start ')) {
-                $linkCode = mb_substr($text, 7);
-                $chatId = $update['message']['chat']['id'];
-                $username = $update['message']['from']['username'] ?? 'User';
-                $userId = cache()->pull('telegram_link:'.$linkCode);
-
-                if ($userId) {
-                    $user = User::query()->find($userId);
-
-                    if ($user) {
-                        $user->notificationSetting()->updateOrCreate(
-                            ['user_id' => $user->id],
-                            [
-                                'telegram_chat_id' => $chatId,
-                                'telegram_enabled' => true,
-                            ]
-                        );
-
-                        $this->sendTelegramMessage(
-                            $chatId,
-                            "✅ *Congratulations, {$username}!*\n\n"
-                            ."Telegram notifications have been successfully linked to your account Mood Tracker! \n\n"
-                            ."Now you'll receive mood reminders and other notifications directly here. 😊 \n\n"
-                            .'Welcome aboard! 🎉'
-                        );
-
-                        return response()->json(['ok' => true, 'status' => 'linked']);
-                    }
-                } else {
-                    $this->sendTelegramMessage(
-                        $chatId,
-                        "❌ *Code Expired or Invalid*\n\n"
-                        ."The link code is valid for 10 minutes only. \n\n"
-                        .'Please generate a new link code from your Mood Tracker app settings and try again.'
-                    );
-
-                    return response()->json(['ok' => true, 'status' => 'expired']);
-                }
-            } elseif ($text === '/start') {
-                $chatId = $update['message']['chat']['id'];
-
-                $this->sendTelegramMessage(
-                    $chatId,
-                    "👋 *Hi!*\n\n"
-                    ."It's a Mood Tracker Bot.\n\n"
-                    ."To link this bot to your Mood Tracker account: \n"
-                    ."1. Open your Mood Tracker app. \n"
-                    ."2. Go to Settings > Notifications \n"
-                    ."3. Click 'Connect Telegram' \n"
-                    .'4. Open the provided link'
-                );
+        if ($message = $update['message'] ?? null) {
+            if ($this->isStaleMessage($message)) {
+                return;
             }
+
+            $this->handleMessage($message, $update);
+
+            return;
         }
 
-        return response()->json(['ok' => true]);
+        if ($callbackQuery = $update['callback_query'] ?? null) {
+            $this->handleCallbackQuery($callbackQuery, $update);
+        }
+    }
+
+    /** @param array<string, mixed> $message */
+    private function isStaleMessage(array $message): bool
+    {
+        $messageDate = $message['date'] ?? null;
+
+        if (! $messageDate) {
+            return false;
+        }
+
+        return (Date::now()->getTimestamp() - $messageDate) > config('services.telegram-bot-api.stale_message_threshold');
     }
 
     /**
-     * Send a message via Telegram Bot API
+     * @param  array<string, mixed>  $message
+     * @param  array<string, mixed>  $update
      */
-    private function sendTelegramMessage(string $chatId, string $text): void
+    private function handleMessage(array $message, array $update): void
     {
-        Log::info('chatId '.$chatId);
-        Log::info('text '.$text);
-        $token = config('services.telegram-bot-api.token');
+        $text = $message['text'] ?? '';
+        $chatId = $message['chat']['id'] ?? null;
 
-        Http::post(sprintf('https://api.telegram.org/bot%s/sendMessage', $token), [
-            'chat_id'    => $chatId,
-            'text'       => $text,
-            'parse_mode' => 'Markdown',
-        ]);
+        if (! $chatId) {
+            return;
+        }
+
+        $user = User::query()->where('telegram_chat_id', (string) $chatId)->first();
+
+        if ($text && str_starts_with($text, '/')) {
+            $this->commandRouter->dispatch($text, (string) $chatId, $user, $update);
+
+            return;
+        }
+
+        if ($user !== null) {
+            $this->telegramService->handleState($user, $text);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $update
+     * @param  array<string, mixed>  $callbackQuery
+     */
+    private function handleCallbackQuery(array $callbackQuery, array $update): void
+    {
+        $chatId = $callbackQuery['message']['chat']['id'] ?? null;
+        $callbackData = $callbackQuery['data'] ?? null;
+
+        if (! $chatId || ! $callbackData) {
+            return;
+        }
+
+        $user = User::query()->where('telegram_chat_id', (string) $chatId)->first();
+
+        $this->callbackRouter->dispatch($callbackData, (string) $chatId, $user, $update);
     }
 }

@@ -39,7 +39,6 @@ class WebhookInfo extends Command
             if (empty($info['url'])) {
                 $this->warn('⚠️  No webhook is currently set');
                 $this->info('Use "php artisan telegram:set-webhook" to set up a webhook');
-                $this->info('Or use "php artisan telegram:polling" to receive updates via polling');
             } else {
                 $this->table(
                     ['Property', 'Value'],

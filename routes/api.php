@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Actions\Telegram\WebhookAction;
+use App\Actions\UserNotificationSetting\GetUserNotificationSettingAction;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MoodEntryController;
+use App\Http\Controllers\Api\MoodStatisticController;
 use App\Http\Controllers\Api\TelegramController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MoodEntryController;
-use App\Http\Controllers\NotificationSettingController;
+use App\Http\Controllers\Api\UserNotificationSettingController;
 use App\Models\User;
 use App\Notifications\MoodReminderNotification;
 use Illuminate\Http\Request;
@@ -24,8 +25,13 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::resource('mood-entries', MoodEntryController::class)->except('edit', 'create');
 
+    Route::post('/mood-entries/statistics', [MoodStatisticController::class, 'getStatistics'])->name('mood-entries.getStatistics');
+
     // Notification Settings
-    Route::post('/notification-settings/update', [NotificationSettingController::class, 'update'])->name('notification-settings.update');
+    Route::post('/notification-settings/store', [UserNotificationSettingController::class, 'store'])->name('notification-settings.store');
+    Route::put('/notification-settings/{userNotificationSetting}/update', [UserNotificationSettingController::class, 'update'])->name('notification-settings.update');
+    Route::delete('/notification-settings/{userNotificationSetting}/delete', [UserNotificationSettingController::class, 'delete'])->name('notification-settings.delete');
+    Route::get('/notification-settings/{userNotificationSetting}', GetUserNotificationSettingAction::class)->name('notification-settings.getOne');
 
     // Telegram
     Route::prefix('telegram')->group(function (): void {
@@ -43,4 +49,4 @@ Route::middleware('auth:sanctum')->group(function (): void {
     });
 });
 
-Route::post('/telegram/webhook', WebhookAction::class)->name('telegram.webhook');
+Route::post('/telegram/webhook', [TelegramController::class, 'webhook']);

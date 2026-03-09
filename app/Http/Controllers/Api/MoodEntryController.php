@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Actions\MoodEntry\CreateMoodEntryAction;
 use App\Actions\MoodEntry\DeleteMoodEntryAction;
 use App\Actions\MoodEntry\FilterMoodEntriesAction;
 use App\Actions\MoodEntry\UpdateMoodEntryAction;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateMoodEntryRequest;
 use App\Http\Resources\MoodEntryResource;
 use App\Models\MoodEntry;

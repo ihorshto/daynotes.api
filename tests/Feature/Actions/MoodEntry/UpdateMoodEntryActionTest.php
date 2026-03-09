@@ -5,11 +5,8 @@ declare(strict_types=1);
 use App\Enums\MoodScore;
 use App\Models\MoodEntry;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Symfony\Component\HttpFoundation\Response;
-
-uses(RefreshDatabase::class);
 
 describe('Update Mood Entry', function (): void {
     beforeEach(function (): void {
@@ -21,7 +18,7 @@ describe('Update Mood Entry', function (): void {
         ]);
     });
 
-    it('updates mood entry score without changing note', function (): void {
+    it('success in updating a mood entry score', function (): void {
         Sanctum::actingAs($this->user);
 
         $updatedData = [
@@ -51,7 +48,7 @@ describe('Update Mood Entry', function (): void {
         ]);
     });
 
-    it('updates mood entry without note', function (): void {
+    it('success in updating mood entry with empty note', function (): void {
         Sanctum::actingAs($this->user);
 
         $updatedData = [
@@ -81,7 +78,37 @@ describe('Update Mood Entry', function (): void {
         ]);
     });
 
-    it('throws 404 when trying to update a non-existing mood entry', function (): void {
+    it('success in updating mood entry with note value null', function (): void {
+        Sanctum::actingAs($this->user);
+
+        $updatedData = [
+            'mood_score' => MoodScore::BAD->value,
+            'note'       => null,
+        ];
+
+        $response = $this->patchJson(route('mood-entries.update', $this->moodEntry->getKey()), $updatedData);
+
+        $response->assertSuccessful()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'user_id',
+                    'mood_score',
+                    'note',
+                    'created_at',
+                    'updated_at',
+                ],
+            ]);
+
+        $this->assertDatabaseHas('mood_entries', [
+            'id'          => $this->moodEntry->getKey(),
+            'user_id'     => $this->user->id,
+            'mood_score'  => MoodScore::BAD->value,
+            'note'        => null,
+        ]);
+    });
+
+    it('fails in updating, throws 404 when trying to update a non-existing mood entry', function (): void {
         Sanctum::actingAs($this->user);
 
         $updatedData = [
@@ -96,7 +123,7 @@ describe('Update Mood Entry', function (): void {
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     });
 
-    it('throws 403 when trying to update another mood entry', function (): void {
+    it('fails in updating, throws 403 when trying to update another user mood entry', function (): void {
         $otherUser = User::factory()->create();
         Sanctum::actingAs($otherUser);
 
@@ -117,7 +144,25 @@ describe('Update Mood Entry', function (): void {
         ]);
     });
 
-    it('throws error when mood score is out of range', function (): void {
+    it('fails in updating, throws 404 when trying to update another mood entry being an unauthorized user', function (): void {
+        $updatedData = [
+            'mood_score' => MoodScore::GOOD->value,
+            'note'       => 'Updated note',
+        ];
+
+        $response = $this->patchJson(route('mood-entries.update', $this->moodEntry->getKey()), $updatedData);
+
+        $response->assertStatus(Response::HTTP_UNAUTHORIZED);
+
+        $this->assertDatabaseHas('mood_entries', [
+            'id'          => $this->moodEntry->getKey(),
+            'user_id'     => $this->user->id,
+            'mood_score'  => MoodScore::NEUTRAL->value,
+            'note'        => 'Original note',
+        ]);
+    });
+
+    it('fails in updating, throws 422 when mood score is out of range', function (): void {
         Sanctum::actingAs($this->user);
 
         $updatedData = [
@@ -136,5 +181,16 @@ describe('Update Mood Entry', function (): void {
             'mood_score'  => MoodScore::NEUTRAL->value,
             'note'        => 'Original note',
         ]);
+    });
+
+    it('fails in updating, throws 422 when mood entry is empty', function (): void {
+        Sanctum::actingAs($this->user);
+
+        $updatedData = [];
+
+        $response = $this->patchJson(route('mood-entries.update', $this->moodEntry->getKey()), $updatedData);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonValidationErrors(['mood_score']);
     });
 });

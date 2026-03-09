@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Telegram\GenerateLinkCodeAction;
+use App\Actions\Telegram\WebhookAction;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -14,6 +15,10 @@ use Illuminate\Support\Facades\Log;
 
 class TelegramController extends Controller
 {
+    public function __construct(
+        private readonly WebhookAction $webhookAction,
+    ) {}
+
     /**
      * Generate a Telegram deep link with a unique code
      */
@@ -40,13 +45,16 @@ class TelegramController extends Controller
     public function disconnect(Request $request)
     {
         $user = $request->user();
-        $settings = $user->notificationSetting;
+        $previousTelegramId = $user->telegram_chat_id;
 
-        if ($settings && $settings->telegram_chat_id) {
+        if ($previousTelegramId) {
+            $user->telegram_chat_id = null;
+            $user->save();
+
             // Send a disconnection message
             try {
                 $this->sendTelegramMessage(
-                    $settings->telegram_chat_id,
+                    $previousTelegramId,
                     " *Telegram Notifications Disconnected*\n\n"
                     ."Your Telegram no longer will receive notifications from our app. \n"
                     .'If this was a mistake, you can reconnect anytime from your account settings.'
@@ -54,14 +62,18 @@ class TelegramController extends Controller
             } catch (Exception $e) {
                 Log::error('Failed to send Telegram disconnection message: '.$e->getMessage());
             }
+
+            return response()->json([
+                'ok'      => true,
+                'message' => 'Telegram disconnected successfully',
+            ]);
         }
 
-        $user->notificationSetting()->update([
-            'telegram_chat_id' => null,
-            'telegram_enabled' => false,
+        return response()->json([
+            'ok'      => false,
+            'message' => 'Telegram is not connected.',
         ]);
 
-        return response()->json(['message' => 'Telegram успішно відключено']);
     }
 
     /**
@@ -73,9 +85,16 @@ class TelegramController extends Controller
         $settings = $user->notificationSetting;
 
         return response()->json([
-            'connected' => $settings && $settings->telegram_enabled && $settings->telegram_chat_id,
+            'connected' => $user->telegram_chat_id !== null,
             'enabled'   => $settings ? $settings->telegram_enabled : false,
         ]);
+    }
+
+    public function webhook(Request $request): JsonResponse
+    {
+        $this->webhookAction->handle($request->all());
+
+        return response()->json(['status' => 'ok']);
     }
 
     /**
