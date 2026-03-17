@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MoodEntryController;
 use App\Http\Controllers\Api\MoodStatisticController;
 use App\Http\Controllers\Api\TelegramController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserNotificationSettingController;
 use App\Models\User;
 use App\Notifications\MoodReminderNotification;
@@ -18,6 +19,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::patch('/user/lang', [UserController::class, 'updateLang'])->name('user.updateLang');
 
     Route::get('/user', function (Request $request) {
         return $request->user();
