@@ -19,7 +19,7 @@ class MoodSelectionCallbackHandler extends CallbackHandler
     {
         if (! $this->user instanceof User) {
             $this->acknowledge();
-            $this->reply('❌ Акаунт не підключено до Mood Tracker. Використайте /start для підключення.');
+            $this->reply(__('messages.common.not_linked'));
 
             return;
         }
@@ -32,9 +32,9 @@ class MoodSelectionCallbackHandler extends CallbackHandler
         $this->acknowledge();
 
         $this->replyWithKeyboard(
-            "✅ Настрій *{$moodScore}* зафіксовано!\n\n📝 Додай нотатку або пропусти:",
+            __('messages.mood.selected', ['score' => $moodScore]),
             [[
-                ['text' => '⏭️ Пропустити', 'callback_data' => 'skip_note'],
+                ['text' => __('messages.mood.skip_button'), 'callback_data' => 'skip_note'],
             ]]
         );
     }

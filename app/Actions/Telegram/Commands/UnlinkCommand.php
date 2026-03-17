@@ -17,10 +17,7 @@ class UnlinkCommand extends Command
     public function handle(): void
     {
         if (! $this->user instanceof User || ! $this->user->telegram_chat_id) {
-            $this->reply(
-                "❌ *Не підключено*\n\n"
-                .'Ваш акаунт не підключений до жодного Telegram чату.'
-            );
+            $this->reply(__('messages.unlink.not_linked'));
 
             return;
         }
@@ -28,9 +25,6 @@ class UnlinkCommand extends Command
         $this->user->telegram_chat_id = null;
         $this->user->save();
 
-        $this->reply(
-            "✅ *Відключено успішно*\n\n"
-            .'Ваш акаунт відключено від цього Telegram чату.'
-        );
+        $this->reply(__('messages.unlink.success'));
     }
 }

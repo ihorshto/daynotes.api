@@ -17,13 +17,13 @@ class AddCommand extends Command
     public function handle(): void
     {
         if (! $this->user instanceof User) {
-            $this->reply('❌ Акаунт не підключено до Mood Tracker. Використайте /start для підключення.');
+            $this->reply(__('messages.common.not_linked'));
 
             return;
         }
 
         $this->replyWithKeyboard(
-            '🎭 *Як ти себе почуваєш?*',
+            __('messages.add.how_are_you'),
             [[
                 ['text' => '1 😢', 'callback_data' => 'mood:1'],
                 ['text' => '2 😞', 'callback_data' => 'mood:2'],

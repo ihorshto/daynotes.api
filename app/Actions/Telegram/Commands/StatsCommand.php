@@ -35,7 +35,7 @@ class StatsCommand extends Command
     public function handle(): void
     {
         if (! $this->user instanceof User) {
-            $this->reply('❌ Акаунт не підключено до Mood Tracker. Використайте /start для підключення.');
+            $this->reply(__('messages.common.not_linked'));
 
             return;
         }
@@ -44,12 +44,7 @@ class StatsCommand extends Command
         $period = StatsPeriod::fromCommand($text);
 
         if (! $period instanceof StatsPeriod) {
-            $this->reply(
-                "❌ Невідома команда. Доступні:\n"
-                ."*/stats_daily*\n"
-                ."*/stats_weekly*\n"
-                .'*/stats_monthly*'
-            );
+            $this->reply(__('messages.stats.unknown_command'));
 
             return;
         }
@@ -57,17 +52,17 @@ class StatsCommand extends Command
         $statistic = $this->getMoodStatisticAction->execute($this->user, $period);
 
         if ($statistic['count'] === 0) {
-            $this->reply('Немає записів за цей період :(');
+            $this->reply(__('messages.stats.no_entries'));
 
             return;
         }
 
-        $this->reply(
-            "📊 *{$period->label()}*\n"
-            ."Середній настрій: *{$statistic['average']}*\n"
-            ."Кількість: *{$statistic['count']}*\n"
-            ."Мін: *{$statistic['min']}*\n"
-            .sprintf('Макс: *%s*', $statistic['max'])
-        );
+        $this->reply(__('messages.stats.result', [
+            'period'  => $period->label(),
+            'average' => $statistic['average'],
+            'count'   => $statistic['count'],
+            'min'     => $statistic['min'],
+            'max'     => $statistic['max'],
+        ]));
     }
 }
