@@ -35,6 +35,10 @@ php artisan view:clear
 # Create a symbolic link for storage
 php artisan storage:link
 
+# Publish vendor assets
+php artisan vendor:publish --tag=request-docs-config
+
+
 COLOR="\e[95m"
 ENDCOLOR="\e[0m"
 
