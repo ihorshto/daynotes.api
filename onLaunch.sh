@@ -16,7 +16,6 @@ composer install --ignore-platform-reqs --no-interaction --no-plugins --no-scrip
 composer dump-autoload
 
 # Install npm dependencies and build assets
-rm -rf node_modules package-lock.json
 npm install && npm run build
 
 # Generate application key
