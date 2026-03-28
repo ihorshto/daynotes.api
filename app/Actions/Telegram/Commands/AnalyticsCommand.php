@@ -48,6 +48,7 @@ class AnalyticsCommand extends Command
                 'user_id'   => $this->user->id,
                 'from_date' => $from->toDateString(),
                 'to_date'   => $to->toDateString(),
+                'lang'      => $this->user->lang,
                 'period'    => $period->value,
             ]
         );
