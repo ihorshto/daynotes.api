@@ -43,7 +43,7 @@ class AnalyticsCommand extends Command
 
         $this->reply(__('messages.analytics.generating', ['period' => $period->label()]));
 
-        Log::info(sprintf('Requesting analytics for user %s from %s to %s for period %s', $this->user->id, $from->toDateString(), $to->toDateString(), $period->value).(' with language '.$this->user->lang));
+        Log::info(sprintf('Requesting analytics for user %s from %s to %s for period %s', $this->user->id, $from->toDateString(), $to->toDateString(), $period->value).(' with language '.$this->user->lang->value));
         Log::info('N8N URL: '.config('services.n8n.url'));
         Log::info('N8N Webhook URL: '.config('services.n8n.url').'/webhook/mood-analytics');
         $response = Http::post(
@@ -52,7 +52,7 @@ class AnalyticsCommand extends Command
                 'user_id'   => $this->user->id,
                 'from_date' => $from->toDateString(),
                 'to_date'   => $to->toDateString(),
-                'lang'      => $this->user->lang,
+                'lang'      => $this->user->lang->value,
                 'period'    => $period->value,
             ]
         );
