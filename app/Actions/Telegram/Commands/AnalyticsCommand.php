@@ -8,7 +8,6 @@ use App\Actions\Telegram\Command;
 use App\Enums\AnalyticsPeriod;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class AnalyticsCommand extends Command
 {
@@ -43,9 +42,6 @@ class AnalyticsCommand extends Command
 
         $this->reply(__('messages.analytics.generating', ['period' => $period->label()]));
 
-        Log::info(sprintf('Requesting analytics for user %s from %s to %s for period %s', $this->user->id, $from->toDateString(), $to->toDateString(), $period->value).(' with language '.$this->user->lang->value));
-        Log::info('N8N URL: '.config('services.n8n.url'));
-        Log::info('N8N Webhook URL: '.config('services.n8n.url').'/webhook/mood-analytics');
         $response = Http::post(
             config('services.n8n.url').'/webhook/mood-analytics',
             [
@@ -56,8 +52,6 @@ class AnalyticsCommand extends Command
                 'period'    => $period->value,
             ]
         );
-
-        Log::info('N8N Response: '.$response->body());
 
         if (! $response->successful()) {
             $this->reply(__('messages.analytics.service_unavailable'));
