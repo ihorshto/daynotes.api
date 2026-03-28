@@ -6,6 +6,7 @@ namespace App\Actions\Telegram;
 
 use App\Models\User;
 use App\Services\TelegramService;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Date;
 use Lorisleiva\Actions\Concerns\AsController;
 
@@ -66,6 +67,10 @@ class WebhookAction
 
         $user = User::query()->where('telegram_chat_id', (string) $chatId)->first();
 
+        if ($user instanceof User) {
+            App::setLocale($user->lang->value);
+        }
+
         if ($text && str_starts_with($text, '/')) {
             $this->commandRouter->dispatch($text, (string) $chatId, $user, $update);
 
@@ -91,6 +96,10 @@ class WebhookAction
         }
 
         $user = User::query()->where('telegram_chat_id', (string) $chatId)->first();
+
+        if ($user instanceof User) {
+            App::setLocale($user->lang->value);
+        }
 
         $this->callbackRouter->dispatch($callbackData, (string) $chatId, $user, $update);
     }

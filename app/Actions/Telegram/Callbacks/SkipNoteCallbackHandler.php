@@ -19,7 +19,7 @@ class SkipNoteCallbackHandler extends CallbackHandler
     {
         if (! $this->user instanceof User) {
             $this->acknowledge();
-            $this->reply('❌ Акаунт не підключено до Mood Tracker. Використайте /start для підключення.');
+            $this->reply(__('messages.common.not_linked'));
 
             return;
         }
@@ -34,8 +34,8 @@ class SkipNoteCallbackHandler extends CallbackHandler
 
         $this->stateManager->clear($this->user);
 
-        $this->acknowledge('Збережено! ✅');
+        $this->acknowledge(__('messages.mood.saved_ack'));
 
-        $this->reply('✅ Настрій збережено без нотатки!');
+        $this->reply(__('messages.mood.saved_no_note'));
     }
 }

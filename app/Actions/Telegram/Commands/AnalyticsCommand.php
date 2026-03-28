@@ -24,7 +24,7 @@ class AnalyticsCommand extends Command
     public function handle(): void
     {
         if (! $this->user instanceof User) {
-            $this->reply('❌ Акаунт не підключено до Mood Tracker. Використайте /start для підключення.');
+            $this->reply(__('messages.common.not_linked'));
 
             return;
         }
@@ -33,19 +33,14 @@ class AnalyticsCommand extends Command
         $period = AnalyticsPeriod::fromCommand($text);
 
         if (! $period instanceof AnalyticsPeriod) {
-            $this->reply(
-                "❌ Невідома команда. Доступні:\n"
-                ."*/analytics_daily*\n"
-                ."*/analytics_weekly*\n"
-                .'*/analytics_monthly*'
-            );
+            $this->reply(__('messages.analytics.unknown_command'));
 
             return;
         }
 
         [$from, $to] = $period->dateRange();
 
-        $this->reply(sprintf('🧠 Генерую аналітику за %s...', $period->label()));
+        $this->reply(__('messages.analytics.generating', ['period' => $period->label()]));
 
         $response = Http::post(
             config('services.n8n.url').'/webhook/mood-analytics',
@@ -58,11 +53,11 @@ class AnalyticsCommand extends Command
         );
 
         if (! $response->successful()) {
-            $this->reply('⚠️ Сервіс аналітики недоступний.');
+            $this->reply(__('messages.analytics.service_unavailable'));
 
             return;
         }
 
-        $this->reply($response->json('output') ?? 'Аналітика недоступна.');
+        $this->reply($response->json('output') ?? __('messages.analytics.unavailable'));
     }
 }

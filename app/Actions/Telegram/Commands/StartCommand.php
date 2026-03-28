@@ -24,15 +24,7 @@ class StartCommand extends Command
             return;
         }
 
-        $this->reply(
-            "👋 *Привіт!*\n\n"
-            ."Це Mood Tracker Bot.\n\n"
-            ."Для підключення:\n"
-            ."1. Відкрийте Mood Tracker\n"
-            ."2. Перейдіть в Налаштування\n"
-            ."3. Натисніть 'Підключити Telegram'\n"
-            .'4. Відкрийте посилання'
-        );
+        $this->reply(__('messages.start.greeting'));
     }
 
     private function handleDeepLink(string $text): void
@@ -41,10 +33,7 @@ class StartCommand extends Command
         $userId = cache()->pull('telegram_link:'.$linkCode);
 
         if (! $userId) {
-            $this->reply(
-                "❌ *Код застарів або невалідний*\n\n"
-                .'Будь ласка, згенеруйте новий код у налаштуваннях Mood Tracker.'
-            );
+            $this->reply(__('messages.start.invalid_code'));
 
             return;
         }
@@ -52,17 +41,13 @@ class StartCommand extends Command
         $user = User::query()->find($userId);
 
         if (! $user) {
-            $this->reply('❌ Користувача не знайдено.');
+            $this->reply(__('messages.start.user_not_found'));
 
             return;
         }
 
         if ($user->telegram_chat_id) {
-            $this->reply(
-                "⚠️ *Вже підключено*\n\n"
-                .'Ваш акаунт вже підключено до іншого Telegram чату. '
-                .'Спочатку відключіть його через налаштування.'
-            );
+            $this->reply(__('messages.start.already_linked'));
 
             return;
         }
@@ -72,10 +57,6 @@ class StartCommand extends Command
 
         $username = $this->update['message']['from']['username'] ?? 'User';
 
-        $this->reply(
-            "✅ *Вітаємо, {$username}!*\n\n"
-            ."Telegram успішно підключено до Mood Tracker! 😊\n\n"
-            .'Тепер ви можете записувати настрій та отримувати нагадування. 🎉'
-        );
+        $this->reply(__('messages.start.success', ['username' => $username]));
     }
 }

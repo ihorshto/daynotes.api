@@ -60,7 +60,7 @@ class TelegramService
 
                 $this->stateManager->clear($user);
 
-                $this->sendTelegramMessage->execute($chatId, 'Настрій збережено ✅');
+                $this->sendTelegramMessage->execute($chatId, __('messages.mood.saved'));
 
                 break;
 

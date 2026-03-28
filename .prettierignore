@@ -9,4 +9,5 @@ bootstrap/cache/
 *.min.css
 composer.lock
 CLAUDE.md
+.junie/
 dist
