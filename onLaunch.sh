@@ -21,11 +21,11 @@ npm install && npm run build
 # Generate application key
 php artisan key:generate
 
-# Ensure correct permissions for storage and cache directories
-chmod -R 775 storage bootstrap/cache
-
 # Migrate the database
 php artisan migrate
+
+# Ensure correct permissions for storage and cache directories
+chmod -R 775 storage bootstrap/cache
 
 # Clear various caches
 php artisan cache:clear
