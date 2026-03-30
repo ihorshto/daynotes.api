@@ -21,11 +21,7 @@ enum StatsPeriod: string
 
     public function label(): string
     {
-        return match ($this) {
-            self::DAILY   => 'Mood Statistics for this day',
-            self::WEEKLY  => 'Mood Statistics for the last week',
-            self::MONTHLY => 'Mood Statistics for the last month',
-        };
+        return __('messages.stats.periods.'.mb_strtolower($this->value));
     }
 
     /**

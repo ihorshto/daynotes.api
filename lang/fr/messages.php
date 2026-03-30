@@ -23,6 +23,11 @@ return [
         'unknown_command' => "❌ Commande inconnue. Disponibles :\n*/stats_daily*\n*/stats_weekly*\n*/stats_monthly*",
         'no_entries'      => 'Aucune entrée pour cette période :(',
         'result'          => "📊 *:period*\nHumeur moyenne : *:average*\nNombre : *:count*\nMin : *:min*\nMax : *:max*",
+        'periods'         => [
+            'daily'   => "Statistiques d'humeur du jour",
+            'weekly'  => "Statistiques d'humeur de la semaine",
+            'monthly' => "Statistiques d'humeur du mois",
+        ],
     ],
 
     'analytics' => [
@@ -30,6 +35,11 @@ return [
         'generating'          => '🧠 Génération des analyses pour :period...',
         'service_unavailable' => '⚠️ Le service d\'analyse est indisponible.',
         'unavailable'         => 'Analyses indisponibles.',
+        'periods'             => [
+            'daily'   => 'jour',
+            'weekly'  => 'semaine',
+            'monthly' => 'mois',
+        ],
     ],
 
     'unlink' => [

@@ -45,6 +45,6 @@ enum AnalyticsPeriod: string
 
     public function label(): string
     {
-        return ucfirst($this->value);
+        return __('messages.analytics.periods.'.$this->value);
     }
 }

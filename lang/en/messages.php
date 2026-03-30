@@ -23,6 +23,11 @@ return [
         'unknown_command' => "❌ Unknown command. Available:\n*/stats_daily*\n*/stats_weekly*\n*/stats_monthly*",
         'no_entries'      => 'No entries for this period :(',
         'result'          => "📊 *:period*\nAverage mood: *:average*\nCount: *:count*\nMin: *:min*\nMax: *:max*",
+        'periods'         => [
+            'daily'   => 'Mood Statistics for this day',
+            'weekly'  => 'Mood Statistics for the last week',
+            'monthly' => 'Mood Statistics for the last month',
+        ],
     ],
 
     'analytics' => [
@@ -30,6 +35,11 @@ return [
         'generating'          => '🧠 Generating analytics for :period...',
         'service_unavailable' => '⚠️ Analytics service is unavailable.',
         'unavailable'         => 'Analytics unavailable.',
+        'periods'             => [
+            'daily'   => 'day',
+            'weekly'  => 'week',
+            'monthly' => 'month',
+        ],
     ],
 
     'unlink' => [
