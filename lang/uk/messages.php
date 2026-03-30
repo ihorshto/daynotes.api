@@ -23,6 +23,11 @@ return [
         'unknown_command' => "❌ Невідома команда. Доступні:\n*/stats_daily*\n*/stats_weekly*\n*/stats_monthly*",
         'no_entries'      => 'Немає записів за цей період :(',
         'result'          => "📊 *:period*\nСередній настрій: *:average*\nКількість: *:count*\nМін: *:min*\nМакс: *:max*",
+        'periods'         => [
+            'daily'   => 'Статистика настрою за день',
+            'weekly'  => 'Статистика настрою за тиждень',
+            'monthly' => 'Статистика настрою за місяць',
+        ],
     ],
 
     'analytics' => [
@@ -30,6 +35,11 @@ return [
         'generating'          => '🧠 Генерую аналітику за :period...',
         'service_unavailable' => '⚠️ Сервіс аналітики недоступний.',
         'unavailable'         => 'Аналітика недоступна.',
+        'periods'             => [
+            'daily'   => 'день',
+            'weekly'  => 'тиждень',
+            'monthly' => 'місяць',
+        ],
     ],
 
     'unlink' => [
