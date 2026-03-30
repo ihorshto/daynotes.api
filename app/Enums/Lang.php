@@ -9,4 +9,5 @@ enum Lang: string
     case En = 'en';
     case Uk = 'uk';
     case Fr = 'fr';
+    case It = 'it';
 }
