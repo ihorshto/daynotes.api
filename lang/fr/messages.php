@@ -47,6 +47,11 @@ return [
         'success'    => "✅ *Déconnecté avec succès*\n\nVotre compte a été déconnecté de ce chat Telegram.",
     ],
 
+    'notifications' => [
+        'reminder'         => '⏰ C\'est l\'heure d\'enregistrer votre humeur 😊',
+        'add_mood_button'  => '📝 Ajouter humeur',
+    ],
+
     'mood' => [
         'selected'      => "✅ Humeur *:score* enregistrée !\n\n📝 Ajoutez une note ou passez :",
         'skip_button'   => '⏭️ Passer',

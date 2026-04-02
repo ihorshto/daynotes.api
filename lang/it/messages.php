@@ -47,6 +47,11 @@ return [
         'success'    => "✅ *Scollegato con successo*\n\nIl tuo account è stato scollegato da questa chat Telegram.",
     ],
 
+    'notifications' => [
+        'reminder'         => '⏰ È ora di registrare il tuo umore 😊',
+        'add_mood_button'  => '📝 Aggiungi umore',
+    ],
+
     'mood' => [
         'selected'      => "✅ Umore *:score* registrato!\n\n📝 Aggiungi una nota o salta:",
         'skip_button'   => '⏭️ Salta',
