@@ -47,6 +47,11 @@ return [
         'success'    => "✅ *Disconnected successfully*\n\nYour account has been disconnected from this Telegram chat.",
     ],
 
+    'notifications' => [
+        'reminder'         => '⏰ This is your mood reminder for writing your mood entry 😊',
+        'add_mood_button'  => '📝 Add mood',
+    ],
+
     'mood' => [
         'selected'      => "✅ Mood *:score* recorded!\n\n📝 Add a note or skip:",
         'skip_button'   => '⏭️ Skip',

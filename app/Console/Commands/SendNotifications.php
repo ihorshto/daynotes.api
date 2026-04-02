@@ -41,6 +41,8 @@ class SendNotifications extends Command
             $userCurrentTime = now($user->timezone)->format('H:i');
             $notificationSetting = $user->notificationSetting;
 
+            app()->setLocale($user->lang->value);
+
             foreach ($notificationSetting as $setting) {
                 $settingTime = Date::parse($setting->time)->format('H:i');
 
@@ -48,7 +50,10 @@ class SendNotifications extends Command
                     if ($setting->telegram_enabled) {
                         $sendTelegramMessage->execute(
                             (int) $user->telegram_chat_id,
-                            '⏰ This is your mood reminder for writing your mood entry 😊'
+                            __('messages.notifications.reminder'),
+                            ['inline_keyboard' => [[
+                                ['text' => __('messages.notifications.add_mood_button'), 'callback_data' => 'add_mood'],
+                            ]]]
                         );
                     }
 
