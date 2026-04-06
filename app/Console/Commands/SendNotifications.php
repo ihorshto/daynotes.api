@@ -25,7 +25,7 @@ class SendNotifications extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Send telegram or email notification to users based on their notification settings';
 
     /**
      * Execute the console command.
