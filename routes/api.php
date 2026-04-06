@@ -9,8 +9,6 @@ use App\Http\Controllers\Api\MoodStatisticController;
 use App\Http\Controllers\Api\TelegramController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\UserNotificationSettingController;
-use App\Models\User;
-use App\Notifications\MoodReminderNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,13 +40,6 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/generate-link', [TelegramController::class, 'generateLinkCode']);
         Route::post('/disconnect', [TelegramController::class, 'disconnect']);
         Route::post('/send-message', [TelegramController::class, 'sendTelegramMessage']);
-    });
-
-    Route::get('/test-notification', function (): string {
-        $user = User::query()->first();
-        $user->notify(new MoodReminderNotification('morning'));
-
-        return 'Notifications sent!';
     });
 });
 
