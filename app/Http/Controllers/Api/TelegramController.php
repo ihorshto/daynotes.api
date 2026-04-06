@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Telegram\GenerateLinkCodeAction;
+use App\Actions\Telegram\SendTelegramMessage;
 use App\Actions\Telegram\WebhookAction;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class TelegramController extends Controller
 {
     public function __construct(
         private readonly WebhookAction $webhookAction,
+        public readonly SendTelegramMessage $sendTelegramMessage,
     ) {}
 
     /**
@@ -53,7 +54,7 @@ class TelegramController extends Controller
 
             // Send a disconnection message
             try {
-                $this->sendTelegramMessage(
+                $this->sendTelegramMessage->execute(
                     $previousTelegramId,
                     " *Telegram Notifications Disconnected*\n\n"
                     ."Your Telegram no longer will receive notifications from our app. \n"
@@ -95,19 +96,5 @@ class TelegramController extends Controller
         $this->webhookAction->handle($request->all());
 
         return response()->json(['status' => 'ok']);
-    }
-
-    /**
-     * Send a message via Telegram Bot API
-     */
-    private function sendTelegramMessage(string $chatId, string $text): void
-    {
-        $token = config('services.telegram-bot-api.token');
-
-        Http::post(sprintf('https://api.telegram.org/bot%s/sendMessage', $token), [
-            'chat_id'    => $chatId,
-            'text'       => $text,
-            'parse_mode' => 'Markdown',
-        ]);
     }
 }
