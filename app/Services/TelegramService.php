@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Actions\Telegram\SendTelegramMessage;
-use App\Enums\MoodScore;
 use App\Enums\UserState;
 use App\Models\MoodEntry;
 use App\Models\User;
@@ -32,13 +31,6 @@ class TelegramService
         }
 
         return 'your_bot';
-    }
-
-    public function isValidNumber(mixed $num): bool
-    {
-        return is_numeric($num)
-            && $num >= MoodScore::VERY_BAD->value
-            && $num <= MoodScore::VERY_GOOD->value;
     }
 
     public function handleState(User $user, ?string $text): void
