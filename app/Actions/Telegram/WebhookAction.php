@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\TelegramService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class WebhookAction
@@ -21,72 +22,75 @@ class WebhookAction
     ) {}
 
     /**
-     * @param  array<string, mixed>  $update
+     * @param  array<string, mixed>  $payload
      */
-    public function handle(array $update): void
+    public function handle(array $payload): void
     {
-        if ($message = $update['message'] ?? null) {
-            if ($this->isStaleMessage($message)) {
+        if ($message = $payload['message'] ?? null) {
+            if ($this->isStaleMessage($message['date'] ?? null)) {
                 return;
             }
 
-            $this->handleMessage($message, $update);
-
-            return;
+            $this->handleMessage($payload, $message);
         }
 
-        if ($callbackQuery = $update['callback_query'] ?? null) {
-            $this->handleCallbackQuery($callbackQuery, $update);
+        if ($callbackQuery = $payload['callback_query'] ?? null) {
+            if ($this->isStaleMessage($callbackQuery['message']['date'] ?? null)) {
+                return;
+            }
+
+            $this->handleCallbackQuery($payload, $callbackQuery);
         }
     }
 
-    /** @param array<string, mixed> $message */
-    private function isStaleMessage(array $message): bool
+    private function isStaleMessage(?int $date): bool
     {
-        $messageDate = $message['date'] ?? null;
-
-        if (! $messageDate) {
+        if (! $date) {
             return false;
         }
 
-        return (Date::now()->getTimestamp() - $messageDate) > config('services.telegram-bot-api.stale_message_threshold');
+        return (Date::now()->getTimestamp() - $date) > config('services.telegram-bot-api.stale_message_threshold');
     }
 
     /**
      * @param  array<string, mixed>  $message
-     * @param  array<string, mixed>  $update
+     * @param  array<string, mixed>  $payload
      */
-    private function handleMessage(array $message, array $update): void
+    private function handleMessage(array $payload, array $message = []): void
     {
         $text = $message['text'] ?? '';
         $chatId = $message['chat']['id'] ?? null;
 
         if (! $chatId) {
+            Log::debug('[WebhookAction] Received message without chat ID', ['message' => $message]);
+
             return;
         }
 
         $user = User::query()->where('telegram_chat_id', (string) $chatId)->first();
 
-        if ($user instanceof User) {
-            App::setLocale($user->lang->value);
-        }
-
-        if ($text && str_starts_with($text, '/')) {
-            $this->commandRouter->dispatch($text, (string) $chatId, $user, $update);
+        if (! $user) {
+            Log::debug('[WebhookAction] Received message from unlinked chat ID', ['chat_id' => $chatId]);
 
             return;
         }
 
-        if ($user !== null) {
-            $this->telegramService->handleState($user, $text);
+        App::setLocale($user->lang->value);
+
+        if ($text && str_starts_with($text, '/')) {
+            $this->commandRouter->dispatch($text, (string) $chatId, $user, $payload);
+
+            return;
         }
+
+        $this->telegramService->handleState($user, $text);
     }
 
     /**
-     * @param  array<string, mixed>  $update
+     * @param  array<string, mixed>  $payload
      * @param  array<string, mixed>  $callbackQuery
      */
-    private function handleCallbackQuery(array $callbackQuery, array $update): void
+    private function handleCallbackQuery(array $payload, array $callbackQuery = []): void
     {
         $chatId = $callbackQuery['message']['chat']['id'] ?? null;
         $callbackData = $callbackQuery['data'] ?? null;
@@ -101,6 +105,6 @@ class WebhookAction
             App::setLocale($user->lang->value);
         }
 
-        $this->callbackRouter->dispatch($callbackData, (string) $chatId, $user, $update);
+        $this->callbackRouter->dispatch($callbackData, (string) $chatId, $user, $payload);
     }
 }

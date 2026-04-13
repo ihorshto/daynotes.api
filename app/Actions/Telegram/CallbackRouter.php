@@ -18,14 +18,14 @@ class CallbackRouter
         $this->registerHandlers();
     }
 
-    public function dispatch(string $callbackData, string $chatId, ?User $user, array $update): void
+    public function dispatch(string $callbackData, string $chatId, ?User $user, array $payload): void
     {
         foreach ($this->handlers as $handlerClass) {
             if ($handlerClass::accepts($callbackData)) {
                 resolve($handlerClass, [
                     'chatId'   => $chatId,
                     'user'     => $user,
-                    'update'   => $update,
+                    'update'   => $payload,
                 ])->handle();
 
                 return;
