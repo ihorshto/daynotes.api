@@ -8,6 +8,7 @@ use App\Actions\Telegram\GenerateLinkCodeAction;
 use App\Actions\Telegram\SendTelegramMessage;
 use App\Actions\Telegram\WebhookAction;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\WebhookRequest;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -91,9 +92,10 @@ class TelegramController extends Controller
         ]);
     }
 
-    public function webhook(Request $request): JsonResponse
+    public function webhook(WebhookRequest $request): JsonResponse
     {
-        $this->webhookAction->handle($request->all());
+        // todo: validate incoming request with Telegram's secret token
+        $this->webhookAction->handle($request->validated());
 
         return response()->json(['status' => 'ok']);
     }

@@ -59,4 +59,8 @@ return [
         'saved_no_note' => '✅ Humeur enregistrée sans note !',
         'saved'         => 'Humeur enregistrée ✅',
     ],
+
+    'rate_limit' => [
+        'webhook_exceeded' => '⚠️ Vous envoyez des requêtes trop rapidement. Veuillez attendre une minute et réessayer.',
+    ],
 ];

@@ -59,4 +59,8 @@ return [
         'saved_no_note' => '✅ Umore salvato senza nota!',
         'saved'         => 'Umore salvato ✅',
     ],
+
+    'rate_limit' => [
+        'webhook_exceeded' => '⚠️ Stai inviando richieste troppo velocemente. Attendi un minuto e riprova.',
+    ],
 ];

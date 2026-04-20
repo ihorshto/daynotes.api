@@ -7,18 +7,27 @@ namespace App\Actions\Telegram;
 use App\Models\User;
 use App\Services\TelegramService;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Lorisleiva\Actions\Concerns\AsController;
 
 class WebhookAction
 {
     use AsController;
 
+    private const CALLBACK_RATE_LIMIT = 5;
+
+    private const CALLBACK_RATE_LIMIT_RESET_IN = 60;
+
+    private const FLOW_LOCK_TTL = 1800;
+
     public function __construct(
         private readonly CommandRouter $commandRouter,
         private readonly CallbackRouter $callbackRouter,
         private readonly TelegramService $telegramService,
+        private readonly SendTelegramMessage $sendTelegramMessage,
     ) {}
 
     /**
@@ -35,10 +44,6 @@ class WebhookAction
         }
 
         if ($callbackQuery = $payload['callback_query'] ?? null) {
-            if ($this->isStaleMessage($callbackQuery['message']['date'] ?? null)) {
-                return;
-            }
-
             $this->handleCallbackQuery($payload, $callbackQuery);
         }
     }
@@ -94,8 +99,17 @@ class WebhookAction
     {
         $chatId = $callbackQuery['message']['chat']['id'] ?? null;
         $callbackData = $callbackQuery['data'] ?? null;
+        $messageId = $callbackQuery['message']['message_id'] ?? null;
 
         if (! $chatId || ! $callbackData) {
+            return;
+        }
+
+        if ($this->isCallbackRateLimited((int) $chatId)) {
+            return;
+        }
+
+        if ($this->isFlowLocked((int) $chatId, $messageId !== null ? (int) $messageId : null)) {
             return;
         }
 
@@ -106,5 +120,43 @@ class WebhookAction
         }
 
         $this->callbackRouter->dispatch($callbackData, (string) $chatId, $user, $payload);
+    }
+
+    private function isFlowLocked(int $chatId, ?int $messageId): bool
+    {
+        if (! $messageId) {
+            return false;
+        }
+
+        $lockKey = 'callback-lock:'.$chatId.':'.$messageId;
+
+        if (Cache::has($lockKey)) {
+            return true;
+        }
+
+        Cache::put($lockKey, true, self::FLOW_LOCK_TTL);
+
+        return false;
+    }
+
+    private function isCallbackRateLimited(int $chatId): bool
+    {
+        $key = 'rate-limit:'.$chatId;
+
+        if (RateLimiter::tooManyAttempts($key, self::CALLBACK_RATE_LIMIT)) {
+            $notificationKey = 'notification-rate-limit:'.$chatId;
+            if (! RateLimiter::tooManyAttempts($notificationKey, 1)) {
+                RateLimiter::hit($notificationKey, self::CALLBACK_RATE_LIMIT_RESET_IN);
+                $this->sendTelegramMessage->execute($chatId, __('messages.rate_limit.webhook_exceeded'));
+            }
+
+            Log::info('[WebhookAction] Rate limit check - too many attempts for chat ID', ['chat_id' => $chatId]);
+
+            return true;
+        }
+
+        RateLimiter::hit($key, self::CALLBACK_RATE_LIMIT_RESET_IN);
+
+        return false;
     }
 }

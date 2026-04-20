@@ -25,7 +25,6 @@ class TelegramService
         $token = config('services.telegram-bot-api.token');
 
         $response = Http::get(sprintf('https://api.telegram.org/bot%s/getMe', $token));
-
         if ($response->successful()) {
             return $response->json('result.username');
         }
@@ -45,7 +44,7 @@ class TelegramService
                 $payload = $this->stateManager->getPayload($user);
 
                 MoodEntry::query()->create([
-                    'user_id'    => $user->id,
+                    'user_id'    => $user->getKey(),
                     'mood_score' => $payload['mood_score'],
                     'note'       => $text,
                 ]);

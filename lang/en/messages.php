@@ -59,4 +59,8 @@ return [
         'saved_no_note' => '✅ Mood saved without a note!',
         'saved'         => 'Mood saved ✅',
     ],
+
+    'rate_limit' => [
+        'webhook_exceeded' => '⚠️ You are sending requests too quickly. Please wait a minute and try again.',
+    ],
 ];
